@@ -18,10 +18,10 @@ library(rnaturalearth)
 library(rnaturalearthdata)
 
 # read phenology dates from MODIS
-modis_pheno_sites <- readRDS("~/pheno/data/modis_pheno_sites.rds")
+modis_pheno_sites <- readRDS("~/phenoEOS/data/modis_pheno_sites.rds")
 
 # read p-model outputs
-modis_pmodel <- readRDS("~/pheno/data//modis_pmodel_outputs.rds")
+modis_pmodel <- readRDS("~/phenoEOS/data//modis_pmodel_outputs.rds")
 modis_pmodel <- modis_pmodel %>% 
   mutate(gpp_net = gpp - rd, 
          lue = gpp / apar)
@@ -122,5 +122,5 @@ map_gpp <- ggplot(data = world) +
 
 pp2 <- (ff_modis_mean_gppnet + ff_modis_anom_gppnet)/ map_eos / map_gpp
 pp2 + plot_annotation(tag_levels = 'A') + plot_layout(heights = c(1.5, 1, 1),widths = c(2, 1, 1))
-ggsave("~/pheno/manuscript/figures/fig_2.png", width = 9, height = 8, dpi=300)
+ggsave("~/phenoEOS/manuscript/figures/fig_2.png", width = 9, height = 8, dpi=300)
 

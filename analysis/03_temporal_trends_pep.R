@@ -11,14 +11,14 @@ library(ggplot2)
 library(patchwork)
 
 # read data pep LPJ-GUESS
-df_pep <- data.table::fread("~/pheno/data/DataMeta_3_Drivers_20_11_10.csv") %>% 
+df_pep <- data.table::fread("~/phenoEOS/data/DataMeta_3_Drivers_20_11_10.csv") %>% 
   as_tibble() %>% 
   rename(lon = LON, lat = LAT, year = YEAR, off = DoY_off, on = DoY_out, 
          anom_off = autumn_anomaly, anom_on = spring_anomaly, 
          species = Species, id_site = PEP_ID, sitename = timeseries)
 
 # read data pep P-model
-pep_pmodel <- readRDS("~/pheno/data/pep_pmodel_outputs.rds")
+pep_pmodel <- readRDS("~/phenoEOS/data/pep_pmodel_outputs.rds")
 pep_pmodel <- pep_pmodel %>% 
   mutate(gpp_net = gpp - rd, 
          lue = gpp / apar)
@@ -78,5 +78,5 @@ ff_lt_pep_on_vs_year <- gg_lt_pep_on_vs_year +
 
 ss1 <- (ff_lt_pep_off_vs_year + ff_lt_pep_cAtot_vs_year)/(ff_lt_pep_gppnet_vs_year + ff_lt_pep_on_vs_year)
 ss1 + plot_annotation(tag_levels = 'A')
-ggsave("~/pheno/manuscript/figures/fig_S1.png", width = 7.5, height = 7.5, dpi=300)
+ggsave("~/phenoEOS/manuscript/figures/fig_S1.png", width = 7.5, height = 7.5, dpi=300)
 

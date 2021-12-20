@@ -12,10 +12,10 @@ library(ggplot2)
 library(patchwork)
 
 # read phenology dates from MODIS
-modis_pheno_sites <- readRDS("~/pheno/data/modis_pheno_sites.rds")
+modis_pheno_sites <- readRDS("~/phenoEOS/data/modis_pheno_sites.rds")
 
 # read p-model outputs
-modis_pmodel <- readRDS("~/pheno/data//modis_pmodel_outputs.rds")
+modis_pmodel <- readRDS("~/phenoEOS/data//modis_pmodel_outputs.rds")
 modis_pmodel <- modis_pmodel %>% 
   mutate(gpp_net = gpp - rd, 
          lue = gpp / apar)
@@ -72,4 +72,4 @@ ff_lt_modis_anom_on <- gg_lt_modis_anom_on +
 
 ss4 <- ff_lt_modis_mean_on + ff_lt_modis_anom_on
 ss4 + plot_annotation(tag_levels = 'A')
-ggsave("~/pheno/manuscript/figures/fig_S4.png", width = 7.5, height = 4, dpi=300)
+ggsave("~/phenoEOS/manuscript/figures/fig_S4.png", width = 7.5, height = 4, dpi=300)

@@ -11,7 +11,7 @@ library(ggplot2)
 library(patchwork)
 
 # read data
-df_pep <- data.table::fread("~/pheno/data/DataMeta_3_Drivers_20_11_10.csv") %>% 
+df_pep <- data.table::fread("~/phenoEOS/data/DataMeta_3_Drivers_20_11_10.csv") %>% 
   as_tibble() %>% 
   rename(lon = LON, lat = LAT, year = YEAR, off = DoY_off, on = DoY_out, 
          anom_off = autumn_anomaly, anom_on = spring_anomaly, 
@@ -64,5 +64,5 @@ ff_iav_pep_off_vs_cAtot <- gg_iav_pep_off_vs_cAtot +
 
 pp1 <- ff_lt_pep_off_vs_year2 + ff_lt_pep_off_vs_cAtot + ff_iav_pep_off_vs_cAtot
 pp1 + plot_annotation(tag_levels = 'A')
-ggsave("~/pheno/manuscript/figures/fig_1.png", width = 8, height = 3, dpi=300)
+ggsave("~/phenoEOS/manuscript/figures/fig_1.png", width = 8, height = 3, dpi=300)
 
