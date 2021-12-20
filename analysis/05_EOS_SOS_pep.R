@@ -1,0 +1,59 @@
+# This script analyses the relationship of spring and autumn phenological dates 
+# from local observations (PEP725 data). Outputs include Figure S3.
+
+# load packages
+library(dplyr)
+library(lme4) 
+library(MuMIn) 
+library(lmerTest) 
+library(effects) 
+library(ggplot2)
+library(patchwork)
+
+# read data
+df_pep <- data.table::fread("~/pheno/data/DataMeta_3_Drivers_20_11_10.csv") %>% 
+  as_tibble() %>% 
+  rename(lon = LON, lat = LAT, year = YEAR, off = DoY_off, on = DoY_out, 
+         anom_off = autumn_anomaly, anom_on = spring_anomaly, 
+         species = Species, id_site = PEP_ID, sitename = timeseries)
+
+# Interannual variation (IAV)
+# EOS ~ SOS
+fit_iav_pep_off_vs_on = lmer(off ~ scale(on) + (1|id_site) + (1|species) , data = df_pep, na.action = "na.exclude")
+summary(fit_iav_pep_off_vs_on)
+r.squaredGLMM(fit_iav_pep_off_vs_on)
+plot(allEffects(fit_iav_pep_off_vs_on))
+out_iav_pep_off_vs_on <- allEffects(fit_iav_pep_off_vs_on)
+gg_iav_pep_off_vs_on <- ggplot_on(out_iav_pep_off_vs_on)
+gg_iav_pep_off_vs_on
+
+# Long-term trends
+# EOS ~ SOS + Year
+fit_lt_pep_off_vs_on_year = lmer(off ~ scale(on) + scale(year) + (1|id_site) + (1|species), data = df_pep, na.action = "na.exclude")
+summary(fit_lt_pep_off_vs_on_year)
+r.squaredGLMM(fit_lt_pep_off_vs_on_year)
+plot(allEffects(fit_lt_pep_off_vs_on_year))
+out_lt_pep_off_vs_on_year <- allEffects(fit_lt_pep_off_vs_on_year)
+gg_lt_pep_off_vs_on   <- ggplot_on(out_lt_pep_off_vs_on_year)
+gg_lt_pep_off_vs_year1 <- ggplot_year(out_lt_pep_off_vs_on_year)
+gg_lt_pep_off_vs_on + gg_lt_pep_off_vs_year1
+
+# Model comparison interannual vs. long-term
+out_anova <- anova(fit_iav_pep_off_vs_on, fit_lt_pep_off_vs_on_year, test="F")  #test="Chisq"
+out_anova
+
+## Supplementary Fig. S3
+ff_lt_pep_off_vs_year1 <- gg_lt_pep_off_vs_year1 +
+  labs(title = expression(paste("EOS ~ ", bold("Year"), " + SOS")), subtitle = "PEP data") 
+
+ff_lt_pep_off_vs_on <- gg_lt_pep_off_vs_on +
+  labs(title = expression(paste("EOS ~ Year + ", bold("SOS"))), subtitle = "PEP data") 
+
+ff_iav_pep_off_vs_on <- gg_iav_pep_off_vs_on +
+  labs(title = "EOS ~ SOS", subtitle = "PEP data") +
+  theme(plot.background = element_rect(fill = "grey"))
+
+ss3 <- ff_lt_pep_off_vs_year1 + ff_lt_pep_off_vs_on + ff_iav_pep_off_vs_on
+ss3 + plot_annotation(tag_levels = 'A')
+ggsave("~/pheno/manuscript/figures/fig_S3.png", width = 8, height = 3, dpi=300)
+
