@@ -45,19 +45,19 @@ out_anova
 # Figure 1
 ff_lt_pep_off_vs_year2 <- gg_lt_pep_off_vs_year2 +
   labs(title = expression(paste("EOS ~ ", bold("Year"), " + ", italic("A")[net])), 
-       subtitle = "PEP data and LPJ-GUESS") +
+       subtitle = "PEP data and LPJ") +
   scale_y_continuous( limits = c(270,294),breaks = seq(270,290,10)) + 
   scale_x_continuous(limits = c(1950,2021), breaks = seq(1960,2020,20))
 
 ff_lt_pep_off_vs_cAtot <- gg_lt_pep_off_vs_cAtot +
   labs(title = expression(paste("EOS ~ Year + ", bolditalic("A")[bold(net)])), 
-       subtitle = "PEP data and LPJ-GUESS") +
+       subtitle = "PEP data and LPJ") +
   scale_y_continuous( limits = c(210,365),breaks = seq(240,360,40)) + 
   scale_x_continuous(limits = c(350,2400), breaks = seq(500,2400,500))
 
 ff_iav_pep_off_vs_cAtot <- gg_iav_pep_off_vs_cAtot +
   labs(title = expression(paste("EOS ~ ", italic("A")[net])), 
-       subtitle = "PEP data and LPJ-GUESS") +
+       subtitle = "PEP data and LPJ") +
   theme(plot.background = element_rect(fill = "grey")) + 
   scale_y_continuous( limits = c(210,365),breaks = seq(240,360,40)) + 
   scale_x_continuous(limits = c(350,2400), breaks = seq(500,2400,500))

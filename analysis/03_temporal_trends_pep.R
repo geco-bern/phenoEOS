@@ -68,13 +68,16 @@ ff_lt_pep_off_vs_year <- gg_lt_pep_off_vs_year +
   labs(title = "EOS ~ Year", subtitle = "PEP data")
 
 ff_lt_pep_cAtot_vs_year <- gg_lt_pep_cAtot_vs_year +
-  labs(title = expression(paste(italic("A")[net], " ~ Year")), subtitle = "PEP data and LPJ-GUESS")
+  labs(title = expression(paste(italic("A")[net], " ~ Year")), subtitle = "PEP data and LPJ",
+       y = expression(paste(italic("A")[net], " (gC m"^-2, " yr"^-1, ")")), x = "Year")
 
 ff_lt_pep_gppnet_vs_year <- gg_lt_pep_gppnet_vs_year +
-  labs(title = expression(paste(italic("A")[net], " ~ Year")), subtitle = "PEP data and P-model")
+  labs(title = expression(paste(italic("A")[net], " ~ Year")), subtitle = "PEP data and P-model",
+       y = expression(paste(italic("A")[net], " (gC m"^-2, " yr"^-1, ")")), x = "Year")
 
 ff_lt_pep_on_vs_year <- gg_lt_pep_on_vs_year +
-  labs(title = "SOS ~ Year", subtitle = "PEP data")
+  labs(title = "SOS ~ Year", subtitle = "PEP data",
+       x = "Year", y = "SOS (DOY)")
 
 ss1 <- (ff_lt_pep_off_vs_year + ff_lt_pep_cAtot_vs_year)/(ff_lt_pep_gppnet_vs_year + ff_lt_pep_on_vs_year)
 ss1 + plot_annotation(tag_levels = 'A')
