@@ -73,7 +73,7 @@ format_drivers <- function(
   
   # bail if not on euler
   if(!grepl('eu-', Sys.info()['nodename'])){
-    stop("You are not on Euler, source data unavailable - abort abort abort!")
+    # stop("You are not on Euler, source data unavailable - abort abort abort!")
   }
   
   # bail if not on euler
@@ -277,12 +277,12 @@ format_drivers <- function(
   }
   
   output <- collect_drivers_sofun(
-    siteinfo       = siteinfo,
+    site_info       = siteinfo,
     params_siml    = params_siml,
     meteo          = ddf_meteo, 
     fapar          = ddf_fapar_unity,
     co2            = df_co2,
-    df_soiltexture = df_soiltexture
+    params_soil    = df_soiltexture
   )
   
   #----- Run model if desired ----

@@ -58,12 +58,12 @@ process_pmodel <- function(
     unnest(cols = c(data))
   
   # grab the site info
-  siteinfo <- df %>%
-    dplyr::select(sitename, siteinfo) %>%
-    unnest(cols = c(siteinfo))
+  site_info <- df %>%
+    dplyr::select(sitename, site_info) %>%
+    unnest(cols = c(site_info))
   
   # merge meta-data with site info
-  mod <- left_join(mod, siteinfo)
+  mod <- left_join(mod, site_info)
   
   # grab some of the forcing data
   tmp <- df %>%
