@@ -9,13 +9,15 @@ library(lmerTest)
 library(effects) 
 library(ggplot2)
 library(patchwork)
+library(jtools)
 
 # read data pep LPJ-GUESS
 df_pep <- data.table::fread("~/phenoEOS/data/DataMeta_3_Drivers_20_11_10.csv") %>% 
   as_tibble() %>% 
   rename(lon = LON, lat = LAT, year = YEAR, off = DoY_off, on = DoY_out, 
          anom_off = autumn_anomaly, anom_on = spring_anomaly, 
-         species = Species, id_site = PEP_ID, sitename = timeseries)
+         species = Species, id_site = PEP_ID, sitename = timeseries) %>%
+  mutate(id_site=as.character(id_site))
 
 # read data pep P-model
 pep_pmodel <- readRDS("~/phenoEOS/data/pep_pmodel_outputs.rds")
@@ -33,8 +35,9 @@ fit_iav_pep_off_vs_gppnet = lmer(off ~ scale(gpp_net) + (1|id_site) + (1|species
 summary(fit_iav_pep_off_vs_gppnet)
 r.squaredGLMM(fit_iav_pep_off_vs_gppnet)
 plot(allEffects(fit_iav_pep_off_vs_gppnet))
+parres11 <- partialize(fit_iav_pep_off_vs_gppnet,"gpp_net")
 out_pep_off_vs_gppnet <- allEffects(fit_iav_pep_off_vs_gppnet)
-gg_iav_pep_off_vs_gppnet <- ggplot_gpp_net(out_pep_off_vs_gppnet)
+gg_iav_pep_off_vs_gppnet <- ggplot_iav_off_gppnet(out_pep_off_vs_gppnet)
 gg_iav_pep_off_vs_gppnet
 
 # Long-term trends
@@ -43,33 +46,38 @@ fit_lt_pep_off_vs_gppnet_year = lmer(off ~ scale(gpp_net) + scale(year) + (1|id_
 summary(fit_lt_pep_off_vs_gppnet_year)
 r.squaredGLMM(fit_lt_pep_off_vs_gppnet_year)
 plot(allEffects(fit_lt_pep_off_vs_gppnet_year))
+parres12 <- partialize(fit_lt_pep_off_vs_gppnet_year,"gpp_net")
+parres13 <- partialize(fit_lt_pep_off_vs_gppnet_year,"year")
 out_pep_off_vs_gppnet_year <- allEffects(fit_lt_pep_off_vs_gppnet_year)
-gg_lt_pep_off_vs_gppnet <- ggplot_gpp_net(out_pep_off_vs_gppnet_year)
-gg_lt_pep_off_vs_year3 <- ggplot_year(out_pep_off_vs_gppnet_year)
-gg_lt_pep_off_vs_gppnet + gg_lt_pep_off_vs_year3
+gg_lt_pep_off_vs_gppnet <- ggplot_lt_off_gppnet(out_pep_off_vs_gppnet_year)
+gg_lt_pep_off_vs_gppnet_year <- ggplot_lt_off_gppnet_year(out_pep_off_vs_gppnet_year)
+gg_lt_pep_off_vs_gppnet + gg_lt_pep_off_vs_gppnet_year
 
 # Model comparison interannual vs. long-term
 out_anova <- anova(fit_iav_pep_off_vs_gppnet, fit_lt_pep_off_vs_gppnet_year)
 out_anova
 
 ## Supplementary Fig. S2
-ff_lt_pep_off_vs_year3 <- gg_lt_pep_off_vs_year3 +
+ff_lt_pep_off_vs_gppnet_year <- gg_lt_pep_off_vs_gppnet_year +
   labs(title = expression(paste("EOS ~ ", bold("Year"), " + ", italic("A")[net])), subtitle = "PEP data and P-model") + 
-  scale_y_continuous( limits = c(276,293),breaks = seq(270,300,5)) + 
-  scale_x_continuous(limits = c(1950,2021), breaks = seq(1960,2020,20))
+  theme(legend.position = "none")
 
 ff_lt_pep_off_vs_gppnet <- gg_lt_pep_off_vs_gppnet +
   labs(title = expression(paste("EOS ~ Year + ", bolditalic("A")[bold(net)])), subtitle = "PEP data and P-model") + 
-  scale_y_continuous( limits = c(273,300),breaks = seq(270,300,10)) + 
-  scale_x_continuous(limits = c(240,1400), breaks = seq(500,1000,500))
+  theme(legend.position = "none")
 
 ff_iav_pep_off_vs_gppnet <- gg_iav_pep_off_vs_gppnet +
   labs(title = expression(paste("EOS ~ ", italic("A")[net])), subtitle = "PEP data and P-model") +
   theme(plot.background = element_rect(fill = "grey")) + 
-  scale_y_continuous( limits = c(278,291),breaks = seq(280,290,5)) + 
-  scale_x_continuous(limits = c(200,1400), breaks = seq(500,1000,500))
+  theme(plot.background = element_rect(colour = "darkgrey", fill=NA, size=2),
+        legend.key = element_rect(fill = NA, color = NA),
+        legend.position = c(.15, .25),
+        legend.direction="vertical",
+        legend.margin = margin(.2, .2, .2, .2),
+        legend.key.size = unit(.6, 'lines')) 
 
-ss2 <- ff_lt_pep_off_vs_year3 + ff_lt_pep_off_vs_gppnet + ff_iav_pep_off_vs_gppnet
+ss2 <- ff_lt_pep_off_vs_gppnet_year + ff_lt_pep_off_vs_gppnet + ff_iav_pep_off_vs_gppnet
 ss2 + plot_annotation(tag_levels = 'A')
 ggsave("~/phenoEOS/manuscript/figures/fig_S2.png", width = 8, height = 3, dpi=300)
+ggsave("~/phenoEOS/manuscript/figures/fig_S2_rev.png", width = 9, height = 3.5, dpi=300)
 

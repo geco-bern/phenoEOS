@@ -10,6 +10,7 @@ library(lmerTest)
 library(effects) 
 library(ggplot2)
 library(patchwork)
+library(jtools)
 library(maps)
 library(viridis)
 library(rgdal)
@@ -39,8 +40,10 @@ fit_iav_modis_off_vs_gppnet = lmer(off ~ scale(gpp_net) + (1|sitename) , data = 
 summary(fit_iav_modis_off_vs_gppnet)
 r.squaredGLMM(fit_iav_modis_off_vs_gppnet)
 plot(allEffects(fit_iav_modis_off_vs_gppnet))
+parres4 <- partialize(fit_iav_modis_off_vs_gppnet,"gpp_net") # calculate partial residuals
 out_iav_modis_off_vs_gppnet <- allEffects(fit_iav_modis_off_vs_gppnet)
-gg_iav_modis_off_vs_gppnet <- ggplot_gpp_net(out_iav_modis_off_vs_gppnet)
+str(out_iav_modis_off_vs_gppnet)
+gg_iav_modis_off_vs_gppnet <- ggplot_gppnet_modis(out_iav_modis_off_vs_gppnet)
 gg_iav_modis_off_vs_gppnet
 
 # Long-term separating mean across years 2001-2018 from interannual anomaly.
@@ -64,18 +67,28 @@ fit_modis_anom_gppnet = lmer(off ~ scale(mean_gpp_net) + scale(anom_gpp_net) + (
 summary(fit_modis_anom_gppnet)
 r.squaredGLMM(fit_modis_anom_gppnet)
 plot(allEffects(fit_modis_anom_gppnet))
+parres5 <- partialize(fit_modis_anom_gppnet,"mean_gpp_net") # calculate partial residuals
+parres6 <- partialize(fit_modis_anom_gppnet,"anom_gpp_net") # calculate partial residuals
 out_modis_anom_gppnet <- allEffects(fit_modis_anom_gppnet)
-gg_modis_mean_gppnet <- ggplot_mean_gpp_net(out_modis_anom_gppnet)
-gg_modis_anom_gppnet <- ggplot_anom_gpp_net(out_modis_anom_gppnet)
-gg_modis_mean_gppnet + gg_modis_anom_gppnet
+gg_modis_mean_gppnet <- ggplot_mean_gppnet(out_modis_anom_gppnet)
+gg_modis_anom_gppnet <- ggplot_anom_gppnet(out_modis_anom_gppnet)
+gg_modis_mean_gppnet + gg_modis_anom_gppnet + plot_layout(guides = "collect") & theme(legend.position = 'right')
 
 # Figure 2
 # Plots
 ff_modis_mean_gppnet <- gg_modis_mean_gppnet +
-  labs(title = expression(paste("EOS ~ ", bold("Mean "), bolditalic("A")[bold(net)], " + Anomalies ", italic("A")[net])), subtitle = "MODIS data and P-model") 
+  labs(title = expression(paste("EOS ~ ", bold("Mean "), bolditalic("A")[bold(net)], 
+                                " + Anomalies ", italic("A")[net])), subtitle = "MODIS data and P-model") +
+  theme(legend.position = "none") 
 
 ff_modis_anom_gppnet <- gg_modis_anom_gppnet +
-  labs(title = expression(paste("EOS ~ Mean ", italic("A")[net], " + " ,bold("Anomalies "), bolditalic("A")[bold(net)])), subtitle = "MODIS data and P-model") 
+  labs(title = expression(paste("EOS ~ Mean ", italic("A")[net], " + " ,
+                                bold("Anomalies "), bolditalic("A")[bold(net)])), subtitle = "MODIS data and P-model") +
+  theme(legend.key = element_rect(fill = NA, color = NA),
+        legend.position = c(.85, .25),
+        legend.direction="vertical",
+        legend.margin = margin(.2, .2, .2, .2),
+        legend.key.size = unit(.6, 'lines')) 
 
 # Maps
 lon_breaks <- seq(from = floor(min(df_modis$lon)), to = ceiling(max(df_modis$lon)), by = 0.1)
@@ -123,4 +136,5 @@ map_gpp <- ggplot(data = world) +
 pp2 <- (ff_modis_mean_gppnet + ff_modis_anom_gppnet)/ map_eos / map_gpp
 pp2 + plot_annotation(tag_levels = 'A') + plot_layout(heights = c(1.5, 1, 1),widths = c(2, 1, 1))
 ggsave("~/phenoEOS/manuscript/figures/fig_2.png", width = 9, height = 8, dpi=300)
+ggsave("~/phenoEOS/manuscript/figures/fig_2_rev.png", width = 9, height = 8, dpi=300)
 

@@ -10,6 +10,7 @@ library(lmerTest)
 library(effects) 
 library(ggplot2)
 library(patchwork)
+library(jtools)
 
 # read phenology dates from MODIS
 modis_pheno_sites <- readRDS("~/phenoEOS/data/modis_pheno_sites.rds")
@@ -33,8 +34,9 @@ fit_iav_modis_off_vs_on = lmer(off ~ scale(on) + (1|sitename), data = df_modis, 
 summary(fit_iav_modis_off_vs_on)
 r.squaredGLMM(fit_iav_modis_off_vs_on)
 plot(allEffects(fit_iav_modis_off_vs_on))
+parres17 <- partialize(fit_iav_modis_off_vs_on,"on") # calculate partial residuals
 out_iav_modis_off_vs_on <- allEffects(fit_iav_modis_off_vs_on)
-gg_iav_modis_off_vs_on <- ggplot_on(out_iav_modis_off_vs_on)
+gg_iav_modis_off_vs_on <- ggplot_on_modis(out_iav_modis_off_vs_on)
 gg_iav_modis_off_vs_on
 
 # Long-term separating mean across years 2001-2018 from interannual anomaly.
@@ -56,8 +58,10 @@ df_modis <- df_modis %>%
 
 fit_lt_modis_anom_on = lmer(off ~ scale(mean_on) + scale(anom_on) + (1|sitename) + (1|year), data = df_modis, na.action = "na.exclude")
 summary(fit_lt_modis_anom_on)
-plot(allEffects(fit_lt_modis_anom_on))
 r.squaredGLMM(fit_lt_modis_anom_on)
+plot(allEffects(fit_lt_modis_anom_on))
+parres18 <- partialize(fit_lt_modis_anom_on,"mean_on") # calculate partial residuals
+parres19 <- partialize(fit_lt_modis_anom_on,"anom_on") # calculate partial residuals
 out_lt_modis_anom_on <- allEffects(fit_lt_modis_anom_on)
 gg_lt_modis_mean_on <- ggplot_mean_on(out_lt_modis_anom_on)
 gg_lt_modis_anom_on <- ggplot_anom_on(out_lt_modis_anom_on)
@@ -65,11 +69,19 @@ gg_lt_modis_mean_on + gg_lt_modis_anom_on
 
 ## Supplementary Fig. S4
 ff_lt_modis_mean_on <- gg_lt_modis_mean_on +
-  labs(title = expression(paste("EOS ~ ", bold("Mean SOS"), " + Anomalies SOS")), subtitle = "MODIS data") 
+  labs(title = expression(paste("EOS ~ ", bold("Mean SOS"), " + Anomalies SOS")), subtitle = "MODIS data") +
+  theme(legend.position = "none")
 
 ff_lt_modis_anom_on <- gg_lt_modis_anom_on +
-  labs(title = expression(paste("EOS ~ Mean SOS + ", bold("Anomalies SOS"))), subtitle = "MODIS data") 
+  labs(title = expression(paste("EOS ~ Mean SOS + ", bold("Anomalies SOS"))), subtitle = "MODIS data") +
+  theme(legend.key = element_rect(fill = NA, color = NA),
+        legend.position = c(.85, .25),
+        legend.direction="vertical",
+        legend.margin = margin(.2, .2, .2, .2),
+        legend.key.size = unit(.6, 'lines')) 
 
 ss4 <- ff_lt_modis_mean_on + ff_lt_modis_anom_on
 ss4 + plot_annotation(tag_levels = 'A')
 ggsave("~/phenoEOS/manuscript/figures/fig_S4.png", width = 7.5, height = 4, dpi=300)
+ggsave("~/phenoEOS/manuscript/figures/fig_S4_rev.png", width = 7.5, height = 4, dpi=300)
+

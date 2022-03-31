@@ -1,31 +1,5 @@
 # This script loads the functions for the subsequent plots.
 
-ggplot_on <- function(x){
-  df <- tibble(upper = x$`scale(on)`$upper[,1],
-               lower = x$`scale(on)`$lower[,1],
-               off = x$`scale(on)`$fit[,1],
-               on = x$`scale(on)`$x[,1])
-  gg <- ggplot() + 
-    geom_ribbon(data = df, aes(x = on, ymin = lower, ymax = upper), alpha = 0.2) +
-    geom_line(data = df, aes(on, off), col = "royalblue") +
-    theme_classic() +
-    labs(x = "SOS (DOY)", y = "EOS (DOY)")
-  return(gg)
-}
-
-ggplot_year <- function(x){
-  df <- tibble(upper = x$`scale(year)`$upper[,1],
-               lower = x$`scale(year)`$lower[,1],
-               off = x$`scale(year)`$fit[,1],
-               year = x$`scale(year)`$x[,1])
-  gg <- ggplot() + 
-    geom_ribbon(data = df, aes(x = year, ymin = lower, ymax = upper), alpha = 0.2) +
-    geom_line(data = df, aes(year, off), col = "royalblue") +
-    theme_classic() +
-    labs(x = "Year", y = "EOS (DOY)")
-  return(gg)
-}
-
 ggplot_cA_tot <- function(x){
   df <- tibble(upper = x$`scale(cA_tot)`$upper[,1],
                lower = x$`scale(cA_tot)`$lower[,1],
@@ -40,6 +14,43 @@ ggplot_cA_tot <- function(x){
   return(gg)
 }
 
+ggplot_iav_cA_tot <- ggplot_cA_tot
+ggplot_lt_cA_tot <- ggplot_cA_tot
+
+ggplot_on <- function(x){
+  df <- tibble(upper = x$`scale(on)`$upper[,1],
+               lower = x$`scale(on)`$lower[,1],
+               off = x$`scale(on)`$fit[,1],
+               on = x$`scale(on)`$x[,1])
+  gg <- ggplot() + 
+    geom_ribbon(data = df, aes(x = on, ymin = lower, ymax = upper), alpha = 0.2) +
+    geom_line(data = df, aes(on, off), col = "royalblue") +
+    theme_classic() +
+    labs(x = "SOS (DOY)", y = "EOS (DOY)")
+  return(gg)
+}
+
+ggplot_on_pep <- ggplot_on
+ggplot_on_modis <- ggplot_on
+
+ggplot_year <- function(x){
+  df <- tibble(upper = x$`scale(year)`$upper[,1],
+               lower = x$`scale(year)`$lower[,1],
+               off = x$`scale(year)`$fit[,1],
+               year = x$`scale(year)`$x[,1])
+  gg <- ggplot() + 
+    geom_ribbon(data = df, aes(x = year, ymin = lower, ymax = upper), alpha = 0.2) +
+    geom_line(data = df, aes(year, off), col = "royalblue") +
+    theme_classic() +
+    labs(x = "Year", y = "EOS (DOY)")
+  return(gg)
+}
+
+ggplot_offyear <- ggplot_year
+ggplot_onyear <- ggplot_year
+ggplot_cA_totyear <- ggplot_year
+ggplot_gppnetyear <- ggplot_year
+
 ggplot_gpp_net <- function(x){
   df <- tibble(upper = x$`scale(gpp_net)`$upper[,1],
                lower = x$`scale(gpp_net)`$lower[,1],
@@ -53,6 +64,9 @@ ggplot_gpp_net <- function(x){
   
   return(gg)
 }
+
+ggplot_gpp_net_modis <- ggplot_gpp_net
+ggplot_gpp_net_pep <- ggplot_gpp_net
 
 ggplot_year_anet <- function(x, y){
   df <- tibble(upper = x$`scale(year)`$upper[,1],
