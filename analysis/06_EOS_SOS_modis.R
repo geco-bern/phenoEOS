@@ -16,7 +16,7 @@ library(jtools)
 modis_pheno_sites <- readRDS("~/phenoEOS/data/modis_pheno_sites.rds")
 
 # read p-model outputs
-modis_pmodel <- readRDS("~/phenoEOS/data//modis_pmodel_outputs.rds")
+modis_pmodel <- readRDS("~/phenoEOS/data/modis_pmodel_outputs.rds")
 modis_pmodel <- modis_pmodel %>% 
   mutate(gpp_net = gpp - rd, 
          lue = gpp / apar)
@@ -27,6 +27,7 @@ df_modis <- modis_pheno_sites %>%
 
 # Select the pheno band
 df_modis <- df_modis %>% rename(on = SOS_2_doy, off = EOS_2_doy) %>% filter(off>on)
+length(unique(df_modis$sitename))
 
 # Interannual variation (IAV)
 # EOS ~ SOS
