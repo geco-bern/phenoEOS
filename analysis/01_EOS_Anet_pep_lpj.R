@@ -19,6 +19,8 @@ df_pep <- data.table::fread("~/phenoEOS/data/DataMeta_3_Drivers_20_11_10.csv") %
          species = Species, id_site = PEP_ID, sitename = timeseries) %>%
   mutate(id_site=as.character(id_site))
 
+length(unique(df_pep$id_site)) #3855
+
 # Interannual variation (IAV)
 # EOS ~ Anet LPJ-GUESS
 fit_iav_pep_off_vs_cAtot = lmer(off ~ scale(cA_tot) + (1|id_site) + (1|species) , data = df_pep, na.action = "na.exclude")

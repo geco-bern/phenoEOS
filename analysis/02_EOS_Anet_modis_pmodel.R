@@ -34,6 +34,8 @@ df_modis <- modis_pheno_sites %>%
 # Select the pheno band
 df_modis <- df_modis %>% rename(on = SOS_2_doy, off = EOS_2_doy) %>% filter(off>on)
 
+length(unique(df_modis$sitename)) #4879
+
 # Interannual variation (IAV)
 # EOS ~ Anet P-model
 fit_iav_modis_off_vs_gppnet = lmer(off ~ scale(gpp_net) + (1|sitename) , data = df_modis, na.action = "na.exclude")

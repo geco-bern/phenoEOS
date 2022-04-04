@@ -1,5 +1,5 @@
 # This script analyses the relationship of spring and autumn phenological dates 
-# remote-sensing observations (MODIS C6 MCD12Q2 data). Outputs include Figure S4
+# remote-sensing observations (MODIS C6 MCD12Q2 data). Outputs include Figure S4.
 .
 # load packages
 library(dplyr)
