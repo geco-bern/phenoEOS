@@ -31,7 +31,6 @@ plot(allEffects(fit_iav_pep_off_vs_cAtot))
 #visreg(fit_iav_pep_off_vs_cAtot, "cA_tot") 
 parres1 <- partialize(fit_iav_pep_off_vs_cAtot,"cA_tot") # calculate partial residuals
 out_iav_pep_off_vs_cAtot <- allEffects(fit_iav_pep_off_vs_cAtot,partial.residuals=T)
-str(out_iav_pep_off_vs_cAtot)
 gg_iav_pep_off_vs_cAtot <- ggplot_iav_off_catot(out_iav_pep_off_vs_cAtot)
 gg_iav_pep_off_vs_cAtot 
 
@@ -46,7 +45,6 @@ plot(allEffects(fit_lt_pep_off_vs_cAtot_year))
 parres2 <- partialize(fit_lt_pep_off_vs_cAtot_year,"cA_tot")
 parres3 <- partialize(fit_lt_pep_off_vs_cAtot_year,"year")
 out_lt_pep_off_vs_cAtot_year <- allEffects(fit_lt_pep_off_vs_cAtot_year,partial.residuals = TRUE)
-str(out_lt_pep_off_vs_cAtot_year)
 gg_lt_pep_off_vs_cAtot <- ggplot_lt_off_catot(out_lt_pep_off_vs_cAtot_year)
 gg_lt_pep_off_vs_year <- ggplot_lt_off_catot_year(out_lt_pep_off_vs_cAtot_year)
 gg_lt_pep_off_vs_cAtot + gg_lt_pep_off_vs_year + plot_layout(guides = "collect") & theme(legend.position = 'right')
@@ -76,8 +74,9 @@ ff_iav_pep_off_vs_cAtot <- gg_iav_pep_off_vs_cAtot +
         legend.margin = margin(.2, .2, .2, .2),
         legend.key.size = unit(.6, 'lines')) 
 
-pp1 <- ff_lt_pep_off_vs_year + ff_lt_pep_off_vs_cAtot + ff_iav_pep_off_vs_cAtot
-pp1 + plot_annotation(tag_levels = 'A') #+ plot_layout(guides = "collect") & theme(legend.position = 'left')
+pp1 <- ff_lt_pep_off_vs_year + ff_lt_pep_off_vs_cAtot + ff_iav_pep_off_vs_cAtot +
+ plot_annotation(tag_levels = 'A') #+ plot_layout(guides = "collect") & theme(legend.position = 'left')
+pp1
 ggsave("~/phenoEOS/manuscript/figures/fig_1.png", width = 8, height = 3, dpi=300)
 ggsave("~/phenoEOS/manuscript/figures/fig_1_rev.png", width = 9, height = 3.5, dpi=300)
 

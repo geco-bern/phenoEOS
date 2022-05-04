@@ -10,13 +10,23 @@ mod <- list.files(pattern = "*.rds") %>%
   map(readRDS) %>% 
   bind_rows()
 
-doy_cutoff <- lubridate::yday("2001-06-21") 
+# Option 1 cutoff
+#doy_cutoff <- lubridate::yday("2001-06-21") 
+
+#df_out <- mod %>%
+#  mutate(gpp   = ifelse(doy >= doy_cutoff, 0, gpp),
+#         apar  = ifelse(doy >= doy_cutoff, 0, apar),
+#         alpha = ifelse(doy >= doy_cutoff, NA, alpha),
+#         rd    = ifelse(doy >= doy_cutoff, 0, rd))
+
+# Option 1 cutoff
+daylength_cutoff <- 11.2
 
 df_out <- mod %>%
-  mutate(gpp   = ifelse(doy >= doy_cutoff, 0, gpp),
-         apar  = ifelse(doy >= doy_cutoff, 0, apar),
-         alpha = ifelse(doy >= doy_cutoff, NA, alpha),
-         rd    = ifelse(doy >= doy_cutoff, 0, rd))
+  mutate(gpp   = ifelse(daylength <= daylength_cutoff, 0, gpp),
+         apar  = ifelse(daylength <= daylength_cutoff, 0, apar),
+         alpha = ifelse(daylength <= daylength_cutoff, NA, alpha),
+         rd    = ifelse(daylength <= daylength_cutoff, 0, rd))
 
 df_out <- df_out %>% 
   group_by(sitename, lat, lon, year) %>% 
@@ -27,6 +37,8 @@ df_out <- df_out %>%
     alpha = mean(alpha, na.rm = TRUE)
   )
 
-#saveRDS(df_out, "/cluster/work/climate/bestocke/data/pep_pmodel_output/pep725/pep_pmodel_output.rds")
-saveRDS(df_out, "/cluster/work/climate/bestocke/data/pep_pmodel_output/modis/modis_pmodel_output.rds")
+#saveRDS(df_out, "/cluster/work/climate/bestocke/data/pep_pmodel_output/outputs/pep_pmodel_21J_output.rds")
+#saveRDS(df_out, "/cluster/work/climate/bestocke/data/pep_pmodel_output/outputs/modis_pmodel_21J_output.rds")
 
+#saveRDS(df_out, "/cluster/work/climate/bestocke/data/pep_pmodel_output/outputs/pep_pmodel_112h_output.rds")
+saveRDS(df_out, "/cluster/work/climate/bestocke/data/pep_pmodel_output/outputs/modis_pmodel_112h_output.rds")

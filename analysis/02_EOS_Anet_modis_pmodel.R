@@ -22,7 +22,7 @@ library(rnaturalearthdata)
 modis_pheno_sites <- readRDS("~/phenoEOS/data/modis_pheno_sites.rds")
 
 # read p-model outputs
-modis_pmodel <- readRDS("~/phenoEOS/data//modis_pmodel_outputs.rds")
+modis_pmodel <- readRDS("~/phenoEOS/data/modis_pmodel_outputs.rds")
 modis_pmodel <- modis_pmodel %>% 
   mutate(gpp_net = gpp - rd, 
          lue = gpp / apar)
@@ -135,8 +135,9 @@ map_gpp <- ggplot(data = world) +
   scale_color_viridis(option="magma",limits=c(80,2200), breaks= seq(500,2000,500)) +
   theme(legend.position="right", panel.background = element_rect(fill = "aliceblue"),axis.title=element_blank(),plot.title = element_text(size = 10))
 
-pp2 <- (ff_modis_mean_gppnet + ff_modis_anom_gppnet)/ map_eos / map_gpp
-pp2 + plot_annotation(tag_levels = 'A') + plot_layout(heights = c(1.5, 1, 1),widths = c(2, 1, 1))
+pp2 <- (ff_modis_mean_gppnet + ff_modis_anom_gppnet)/ map_eos / map_gpp +
+ plot_annotation(tag_levels = 'A') + plot_layout(heights = c(1.5, 1, 1),widths = c(2, 1, 1))
+pp2
 ggsave("~/phenoEOS/manuscript/figures/fig_2.png", width = 9, height = 8, dpi=300)
 ggsave("~/phenoEOS/manuscript/figures/fig_2_rev.png", width = 9, height = 8, dpi=300)
 
