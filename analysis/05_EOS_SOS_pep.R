@@ -71,7 +71,6 @@ ggsave("~/phenoEOS/manuscript/figures/fig_S3.png", width = 8, height = 3, dpi=30
 ggsave("~/phenoEOS/manuscript/figures/fig_S3_rev.png", width = 9, height = 3.5, dpi=300)
 
 
-
 #### Email
 # Long-term trends
 # EOS ~ SOS + Year

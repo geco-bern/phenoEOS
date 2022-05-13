@@ -22,7 +22,10 @@ library(rnaturalearthdata)
 modis_pheno_sites <- readRDS("~/phenoEOS/data/modis_pheno_sites.rds")
 
 # read p-model outputs
-modis_pmodel <- readRDS("~/phenoEOS/data/modis_pmodel_outputs.rds")
+#modis_pmodel <- readRDS("~/phenoEOS/data/modis_pmodel_outputs.rds")
+#modis_pmodel <- readRDS("~/phenoEOS/outputs/modis_pmodel_21J_output.rds")
+modis_pmodel <- readRDS("~/phenoEOS/outputs/modis_pmodel_112h_output.rds")
+
 modis_pmodel <- modis_pmodel %>% 
   mutate(gpp_net = gpp - rd, 
          lue = gpp / apar)
@@ -123,8 +126,8 @@ map_eos <- ggplot(data = world) +
   geom_sf(fill= "grey",size=.3) + 
   coord_sf(xlim = c(-180, 180), ylim = c(15, 75), expand = F) +
   geom_point(data = df_modis_agg, aes(x = lon, y = lat, color = mean_eos),size=.3) +
-  labs(color="EOS (DOY)") +
-  scale_color_viridis(option="viridis",limits=c(235,342), breaks= seq(260,340,20)) +
+  labs(color="EOS (DOY)        ") +
+  scale_color_viridis(option="viridis",limits=c(235,342), breaks= seq(240,340,20)) +
   theme(legend.position="right", panel.background = element_rect(fill = "aliceblue"),axis.title=element_blank(),plot.title = element_text(size = 10)) 
 
 map_gpp <- ggplot(data = world) + 
@@ -132,7 +135,7 @@ map_gpp <- ggplot(data = world) +
   coord_sf(xlim = c(-180, 180), ylim = c(15, 75), expand = F) +
   geom_point(data = df_modis_agg, aes(x = lon, y = lat, color = mean_gpp),size=.3) +
   labs(color=expression(paste(italic("A")[net], " (gC m"^-2, " yr"^-1, ")"))) +
-  scale_color_viridis(option="magma",limits=c(80,2200), breaks= seq(500,2000,500)) +
+  scale_color_viridis(option="magma",limits=c(900,3500), breaks= seq(1000,3500,500)) +
   theme(legend.position="right", panel.background = element_rect(fill = "aliceblue"),axis.title=element_blank(),plot.title = element_text(size = 10))
 
 pp2 <- (ff_modis_mean_gppnet + ff_modis_anom_gppnet)/ map_eos / map_gpp +

@@ -20,7 +20,9 @@ df_pep <- data.table::fread("~/phenoEOS/data/DataMeta_3_Drivers_20_11_10.csv") %
   mutate(id_site=as.character(id_site))
 
 # read data pep P-model
-pep_pmodel <- readRDS("~/phenoEOS/data/pep_pmodel_outputs.rds")
+#pep_pmodel <- readRDS("~/phenoEOS/data/pep_pmodel_outputs.rds")
+#pep_pmodel <- readRDS("~/phenoEOS/outputs/pep_pmodel_21J_output.rds")
+pep_pmodel <- readRDS("~/phenoEOS/outputs/pep_pmodel_112h_output.rds")
 pep_pmodel <- pep_pmodel %>% 
   mutate(gpp_net = gpp - rd, 
          lue = gpp / apar)

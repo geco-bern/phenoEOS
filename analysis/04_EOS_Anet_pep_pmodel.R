@@ -20,7 +20,9 @@ df_pep <- data.table::fread("~/phenoEOS/data/DataMeta_3_Drivers_20_11_10.csv") %
   mutate(id_site=as.character(id_site))
 
 # read data pep P-model
-pep_pmodel <- readRDS("~/phenoEOS/data/pep_pmodel_outputs.rds")
+#pep_pmodel <- readRDS("~/phenoEOS/data/pep_pmodel_outputs.rds")
+#pep_pmodel <- readRDS("~/phenoEOS/outputs/pep_pmodel_21J_output.rds")
+pep_pmodel <- readRDS("~/phenoEOS/outputs/pep_pmodel_112h_output.rds")
 pep_pmodel <- pep_pmodel %>% 
   mutate(gpp_net = gpp - rd, 
          lue = gpp / apar)
@@ -44,6 +46,8 @@ gg_iav_pep_off_vs_gppnet
 # EOS ~ Anet P-model + Year 
 fit_lt_pep_off_vs_gppnet_year = lmer(off ~ scale(gpp_net) + scale(year) + (1|id_site) + (1|species), data = df_pep, na.action = "na.exclude")
 summary(fit_lt_pep_off_vs_gppnet_year)
+summary(fit_lt_pep_off_vs_gppnet_year)$coefficients
+summary(fit_lt_pep_off_vs_gppnet_year)$varcor
 r.squaredGLMM(fit_lt_pep_off_vs_gppnet_year)
 plot(allEffects(fit_lt_pep_off_vs_gppnet_year))
 parres12 <- partialize(fit_lt_pep_off_vs_gppnet_year,"gpp_net")
@@ -56,6 +60,18 @@ gg_lt_pep_off_vs_gppnet + gg_lt_pep_off_vs_gppnet_year
 # Model comparison interannual vs. long-term
 out_anova <- anova(fit_iav_pep_off_vs_gppnet, fit_lt_pep_off_vs_gppnet_year)
 out_anova
+
+library(sjPlot) # plot_model fc
+figboth1 <- plot_model(fit_lt_pep_off_vs_gppnet_year, type = "pred", terms = c("year")) +
+  labs(title = expression(paste("EOS ~ ", bold("Year"), " + ", italic("A")[net])), 
+       subtitle = "PEP data and P-model") 
+figboth2 <- plot_model(fit_lt_pep_off_vs_gppnet_year, type = "pred", terms = c("gpp_net")) +
+  labs(title = expression(paste("EOS ~ Year + ", bolditalic("A")[bold(net)])), 
+       subtitle = "PEP data and P-model") 
+figgpp <- plot_model(fit_iav_pep_off_vs_gppnet, type = "pred", terms = c("gpp_net")) +
+  labs(title = expression(paste("EOS ~ ", italic("A")[net])), subtitle = "PEP data and P-model")
+
+figboth1 + figboth2 + figgpp
 
 ## Supplementary Fig. S2
 ff_lt_pep_off_vs_gppnet_year <- gg_lt_pep_off_vs_gppnet_year +
