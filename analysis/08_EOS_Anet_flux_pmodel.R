@@ -11,27 +11,27 @@ library(effects)
 library(ggplot2)
 library(patchwork)
 library(jtools)
-library(sjPlot)
+library(ggeffects)
 
 # read flux data and phenology dates from MODIS
 data_flux_modis_pmodel <- readRDS("~/phenoEOS/data/data_flux_modis_pmodel.rds")
-data_flux_modis_pmodel <- data_flux_modis_pmodel %>% rename(on = SOS_2_doy, off = EOS_2_doy,gpp=gpp_flux)
+data_flux_modis_pmodel <- data_flux_modis_pmodel %>% rename(on = SOS_2_doy, off = EOS_2_doy,gpp=gpp_pmodel)
 length(unique(data_flux_modis_pmodel$sitename))
 ggplot(data_flux_modis_pmodel) + geom_point(aes(gpp,off))
 
 # Interannual variation (IAV)
 # EOS ~ Anet flux data
-fit_iav_flux_off_vs_gppnet = lmer(off ~ scale(gpp) + (1|sitename) , data = data_flux_modis_pmodel, na.action = "na.exclude")
-summary(fit_iav_flux_off_vs_gppnet)
-r.squaredGLMM(fit_iav_flux_off_vs_gppnet)
-plot(allEffects(fit_iav_flux_off_vs_gppnet))
+fit_iav_pmodel_off_vs_gppnet = lmer(off ~ scale(gpp) + (1|sitename) , data = data_flux_modis_pmodel, na.action = "na.exclude")
+summary(fit_iav_pmodel_off_vs_gppnet)
+r.squaredGLMM(fit_iav_pmodel_off_vs_gppnet)
+plot(allEffects(fit_iav_pmodel_off_vs_gppnet))
 
 # Long-term trends
 # EOS ~ Anet flux data + Year 
-fit_lt_flux_off_vs_gppnet = lmer(off ~ scale(gpp) + scale(year) + (1|sitename), data = data_flux_modis_pmodel, na.action = "na.exclude")
-summary(fit_lt_flux_off_vs_gppnet)
-r.squaredGLMM(fit_lt_flux_off_vs_gppnet)
-plot(allEffects(fit_lt_flux_off_vs_gppnet))
+fit_lt_pmodel_off_vs_gppnet = lmer(off ~ scale(gpp) + scale(year) + (1|sitename), data = data_flux_modis_pmodel, na.action = "na.exclude")
+summary(fit_lt_pmodel_off_vs_gppnet)
+r.squaredGLMM(fit_lt_pmodel_off_vs_gppnet)
+plot(allEffects(fit_lt_pmodel_off_vs_gppnet))
 
 # Spatial variation
 # Long-term separating mean across years 2001-2018 from interannual anomaly.
@@ -51,21 +51,27 @@ data_flux_modis_pmodel <- data_flux_modis_pmodel %>%
   mutate(data = purrr::map(data, ~separate_anom(.))) %>% 
   unnest(data)
 
-fit_flux_anom_gppnet = lmer(off ~ scale(mean_gpp_net) + scale(anom_gpp_net) + (1|sitename), data = data_flux_modis_pmodel, na.action = "na.exclude")
-summary(fit_flux_anom_gppnet)
-r.squaredGLMM(fit_flux_anom_gppnet)
-plot(allEffects(fit_flux_anom_gppnet))
+fit_pmodel_anom_gppnet = lmer(off ~ scale(mean_gpp_net) + scale(anom_gpp_net) + (1|sitename), data = data_flux_modis_pmodel, na.action = "na.exclude")
+summary(fit_pmodel_anom_gppnet)
+r.squaredGLMM(fit_pmodel_anom_gppnet)
+plot(allEffects(fit_pmodel_anom_gppnet))
 
-gg_flux_mean_gppnet <- plot_model(fit_flux_anom_gppnet, type = "pred", terms = c("mean_gpp_net")) +
+gg_pmodel_mean_gppnet <- plot_model(fit_pmodel_anom_gppnet, type = "pred", terms = c("mean_gpp_net")) +
   theme_classic() +
   labs(title = expression(paste("EOS ~ ", bold("Mean "), bolditalic("A")[bold(net)], 
-                                " + Anomalies ", italic("A")[net])), subtitle = "FLUXNET observations",
+                                " + Anomalies ", italic("A")[net])), subtitle = "P-model simulations",
        x = expression(paste("Mean " ,italic("A")[net], " (gC m"^-2, " yr"^-1, ")")), y = "EOS (DOY)")
-gg_flux_mean_gppnet
+gg_pmodel_mean_gppnet
 
-gg_flux_anom_gppnet <- plot_model(fit_flux_anom_gppnet, type = "pred", terms = c("anom_gpp_net")) +
+gg_pmodel_anom_gppnet <- plot_model(fit_pmodel_anom_gppnet, type = "pred", terms = c("anom_gpp_net")) +
   theme_classic() +
   labs(title = expression(paste("EOS ~ Mean ", italic("A")[net], " + " ,
-                                bold("Anomalies "), bolditalic("A")[bold(net)])), subtitle = "FLUXNET observations",
+                                bold("Anomalies "), bolditalic("A")[bold(net)])), subtitle = "P-model simulations",
        x = expression(paste("Anomalies " ,italic("A")[net], " (gC m"^-2, " yr"^-1, ")")), y = "EOS (DOY)")
-gg_flux_anom_gppnet
+gg_pmodel_anom_gppnet
+
+
+
+
+  
+

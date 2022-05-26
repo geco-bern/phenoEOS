@@ -143,4 +143,7 @@ pp2 <- (ff_modis_mean_gppnet + ff_modis_anom_gppnet)/ map_eos / map_gpp +
 pp2
 ggsave("~/phenoEOS/manuscript/figures/fig_2.png", width = 9, height = 8, dpi=300)
 ggsave("~/phenoEOS/manuscript/figures/fig_2_rev.png", width = 9, height = 8, dpi=300)
+ff_modis_mean_gppnet / ff_modis_anom_gppnet
+ggsave("~/phenoEOS/manuscript/figures/fig_2_bis.png", width = 3.7, height = 6, dpi=300)
+
 
