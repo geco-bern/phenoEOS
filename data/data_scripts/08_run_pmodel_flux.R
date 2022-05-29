@@ -90,6 +90,7 @@ model_data <-  model_data %>%
          doy=lubridate::yday(date),
          daylength=daylength(lat, doy))
 length(unique(model_data$sitename))
+saveRDS(model_data, "~/phenoEOS/data/fluxnet_sites/p_model/model_data.rds")
 
 # aggregate gpp data summing up to the cutoff
 # Option 1 cutoff

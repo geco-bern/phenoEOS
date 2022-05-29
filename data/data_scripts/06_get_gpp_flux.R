@@ -38,6 +38,7 @@ flux_sites_data <-  flux_sites_data %>% select(c(1:3,359,360,361,362)) %>%
 length(unique(flux_sites_data$sitename))
 unique(flux_sites_data$IGBP)
 min(flux_sites_data$lat)
+saveRDS(flux_sites_data, "~/phenoEOS/data/fluxnet_sites/flux_sites_data.rds")
 
 # check gaps in the data
 quality_control <- flux_sites_data %>% group_by(sitename, year) %>% summarise(gpp_mean=mean(gpp))
@@ -48,11 +49,11 @@ quality_control %>% filter(is.na(gpp_mean)) %>% summarise(sitename=unique(sitena
 # doy_cutoff <- lubridate::yday("2001-06-21") 
 daylength_cutoff <- 11.2
 
-flux_sites_data <- flux_sites_data %>%
+df_out_flux <- flux_sites_data %>%
   #mutate(gpp_21Jun = ifelse(!is.na(gpp) & doy >= doy_cutoff, 0, gpp)) %>%
   mutate(gpp_11h = ifelse(!is.na(gpp) & daylength <= daylength_cutoff, 0, gpp)) # alternative cutoff
 
-df_flux_agg <- flux_sites_data %>% 
+df_flux_agg <- df_out_flux %>% 
   group_by(sitename, year) %>% 
   summarise(#gpp_21Jun = sum(gpp_21Jun,na.rm = F),
             gpp_11h = sum(gpp_11h,na.rm = F)) %>%

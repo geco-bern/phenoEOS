@@ -51,7 +51,7 @@ data_flux_modis_pmodel <- data_flux_modis_pmodel %>%
   mutate(data = purrr::map(data, ~separate_anom(.))) %>% 
   unnest(data)
 
-fit_pmodel_anom_gppnet = lmer(off ~ scale(mean_gpp_net) + scale(anom_gpp_net) + (1|sitename), data = data_flux_modis_pmodel, na.action = "na.exclude")
+fit_pmodel_anom_gppnet = lmer(off ~ scale(mean_gpp_net) + scale(anom_gpp_net) + (1|sitename) + (1|year), data = data_flux_modis_pmodel, na.action = "na.exclude")
 summary(fit_pmodel_anom_gppnet)
 r.squaredGLMM(fit_pmodel_anom_gppnet)
 plot(allEffects(fit_pmodel_anom_gppnet))
@@ -60,14 +60,16 @@ gg_pmodel_mean_gppnet <- plot_model(fit_pmodel_anom_gppnet, type = "pred", terms
   theme_classic() +
   labs(title = expression(paste("EOS ~ ", bold("Mean "), bolditalic("A")[bold(net)], 
                                 " + Anomalies ", italic("A")[net])), subtitle = "P-model simulations",
-       x = expression(paste("Mean " ,italic("A")[net], " (gC m"^-2, " yr"^-1, ")")), y = "EOS (DOY)")
+       x = expression(paste("Mean " ,italic("A")[net], " (gC m"^-2, " yr"^-1, ")")), y = "EOS (DOY)") +
+  annotate("text", x = 1050, y = 320, label = "italic(P) == 0.081",parse = TRUE,size=3)
 gg_pmodel_mean_gppnet
 
 gg_pmodel_anom_gppnet <- plot_model(fit_pmodel_anom_gppnet, type = "pred", terms = c("anom_gpp_net")) +
   theme_classic() +
   labs(title = expression(paste("EOS ~ Mean ", italic("A")[net], " + " ,
                                 bold("Anomalies "), bolditalic("A")[bold(net)])), subtitle = "P-model simulations",
-       x = expression(paste("Anomalies " ,italic("A")[net], " (gC m"^-2, " yr"^-1, ")")), y = "EOS (DOY)")
+       x = expression(paste("Anomalies " ,italic("A")[net], " (gC m"^-2, " yr"^-1, ")")), y = "EOS (DOY)") +
+  annotate("text", x = -300, y = 280, label = "italic(P) == 0.724",parse = TRUE,size=3)
 gg_pmodel_anom_gppnet
 
 
