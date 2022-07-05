@@ -82,7 +82,7 @@ model_data <- output %>%
   tidyr::unnest(c(site_info, data))
 str(model_data)
 
-ggplot() + geom_line(data = model_data, aes(date, gpp),colour = "red") 
+#ggplot() + geom_line(data = model_data, aes(date, gpp),colour = "red") 
 
 # prepare variables 
 model_data <-  model_data %>% 
@@ -91,18 +91,21 @@ model_data <-  model_data %>%
          daylength=daylength(lat, doy))
 length(unique(model_data$sitename))
 saveRDS(model_data, "~/phenoEOS/data/fluxnet_sites/p_model/model_data.rds")
+#model_data <- readRDS("~/phenoEOS/data/fluxnet_sites/p_model/model_data.rds")
 
 # aggregate gpp data summing up to the cutoff
 # Option 1 cutoff
 daylength_cutoff <- 11.2
 
 df_out_11h <- model_data %>%
-  mutate(gpp   = ifelse(daylength <= daylength_cutoff, 0, gpp))
+  mutate(gpp   = ifelse(daylength <= daylength_cutoff, 0, gpp),
+         rd    = ifelse(daylength <= daylength_cutoff, 0, rd))
 
 df_out_11h <- df_out_11h %>% 
   group_by(sitename, lat, lon, year) %>% 
   summarise(
-    gpp = sum(gpp)
+    gpp = sum(gpp),
+    rd = sum(rd)
   )
 saveRDS(df_out_11h, "~/phenoEOS/data/fluxnet_sites/p_model/flux_pmodel_11h_output.rds")
 

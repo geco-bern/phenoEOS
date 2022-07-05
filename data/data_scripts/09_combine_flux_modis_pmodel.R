@@ -25,6 +25,8 @@ df_out_11h <- df_out_11h %>% rename(gpp_pmodel=gpp)
 data_flux_modis_pmodel <- df_fluxnet_agg %>% left_join(df_modis_pheno_flux) %>% left_join(df_out_11h)
 length(unique(data_flux_modis_pmodel$sitename))
 saveRDS(data_flux_modis_pmodel, "~/phenoEOS/data/data_flux_modis_pmodel.rds")
+saveRDS(data_flux_modis_pmodel, "~/phenoEOS/data/data_flux_modis_pmodel2.rds")
+
 table(df_fluxnet_agg$year)
 table(df_modis_pheno_flux$year)
 table(df_out_11h$year)

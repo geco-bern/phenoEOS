@@ -13,19 +13,18 @@ library(patchwork)
 library(jtools)
 library(maps)
 library(viridis)
-library(rgdal)
 library(sf)
 library(rnaturalearth)
 library(rnaturalearthdata)
+
+# load functions for plots
+source("~/phenoEOS/analysis/00_load_functions_data.R")
 
 # read phenology dates from MODIS
 modis_pheno_sites <- readRDS("~/phenoEOS/data/modis_pheno_sites.rds")
 
 # read p-model outputs
-#modis_pmodel <- readRDS("~/phenoEOS/data/modis_pmodel_outputs.rds")
-#modis_pmodel <- readRDS("~/phenoEOS/outputs/modis_pmodel_21J_output.rds")
-modis_pmodel <- readRDS("~/phenoEOS/outputs/modis_pmodel_112h_output.rds")
-
+modis_pmodel <- readRDS("~/phenoEOS/data/modis_pmodel_outputs.rds") #11.2h
 modis_pmodel <- modis_pmodel %>% 
   mutate(gpp_net = gpp - rd, 
          lue = gpp / apar)
@@ -36,7 +35,6 @@ df_modis <- modis_pheno_sites %>%
 
 # Select the pheno band
 df_modis <- df_modis %>% rename(on = SOS_2_doy, off = EOS_2_doy) %>% filter(off>on)
-
 length(unique(df_modis$sitename)) #4879
 
 # Interannual variation (IAV)
@@ -70,6 +68,9 @@ df_modis <- df_modis %>%
 
 fit_modis_anom_gppnet = lmer(off ~ scale(mean_gpp_net) + scale(anom_gpp_net) + (1|sitename) + (1|year), data = df_modis, na.action = "na.exclude")
 summary(fit_modis_anom_gppnet)
+out <- summary(fit_modis_anom_gppnet)
+out$coefficients[,"Estimate"]
+out$coefficient[,"Std. Error"]*1.96
 r.squaredGLMM(fit_modis_anom_gppnet)
 plot(allEffects(fit_modis_anom_gppnet))
 parres5 <- partialize(fit_modis_anom_gppnet,"mean_gpp_net") # calculate partial residuals
@@ -78,6 +79,12 @@ out_modis_anom_gppnet <- allEffects(fit_modis_anom_gppnet)
 gg_modis_mean_gppnet <- ggplot_mean_gppnet(out_modis_anom_gppnet)
 gg_modis_anom_gppnet <- ggplot_anom_gppnet(out_modis_anom_gppnet)
 gg_modis_mean_gppnet + gg_modis_anom_gppnet + plot_layout(guides = "collect") & theme(legend.position = 'right')
+# Unscaled
+trend_unscaled <- out$coefficients["scale(mean_gpp_net)","Estimate"]/ sd(df_modis$mean_gpp_net)
+error_unscaled <- out$coefficients["scale(mean_gpp_net)","Std. Error"]/ sd(df_modis$mean_gpp_net)
+
+trend_unscaled <- out$coefficients["scale(anom_gpp_net)","Estimate"]/ sd(df_modis$anom_gpp_net)
+error_unscaled <- out$coefficients["scale(anom_gpp_net)","Std. Error"]/ sd(df_modis$anom_gpp_net)
 
 # Figure 2
 # Plots
@@ -143,7 +150,3 @@ pp2 <- (ff_modis_mean_gppnet + ff_modis_anom_gppnet)/ map_eos / map_gpp +
 pp2
 ggsave("~/phenoEOS/manuscript/figures/fig_2.png", width = 9, height = 8, dpi=300)
 ggsave("~/phenoEOS/manuscript/figures/fig_2_rev.png", width = 9, height = 8, dpi=300)
-ff_modis_mean_gppnet / ff_modis_anom_gppnet
-ggsave("~/phenoEOS/manuscript/figures/fig_2_bis.png", width = 3.7, height = 6, dpi=300)
-
-

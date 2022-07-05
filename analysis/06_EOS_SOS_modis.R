@@ -12,6 +12,9 @@ library(ggplot2)
 library(patchwork)
 library(jtools)
 
+# load functions for plots
+source("~/phenoEOS/analysis/00_load_functions_data.R")
+
 # read phenology dates from MODIS
 modis_pheno_sites <- readRDS("~/phenoEOS/data/modis_pheno_sites.rds")
 
@@ -27,7 +30,6 @@ df_modis <- modis_pheno_sites %>%
 
 # Select the pheno band
 df_modis <- df_modis %>% rename(on = SOS_2_doy, off = EOS_2_doy) %>% filter(off>on)
-length(unique(df_modis$sitename))
 
 # Interannual variation (IAV)
 # EOS ~ SOS
@@ -81,8 +83,8 @@ ff_lt_modis_anom_on <- gg_lt_modis_anom_on +
         legend.margin = margin(.2, .2, .2, .2),
         legend.key.size = unit(.6, 'lines')) 
 
-ss4 <- ff_lt_modis_mean_on + ff_lt_modis_anom_on
-ss4 + plot_annotation(tag_levels = 'A')
+ss4 <- ff_lt_modis_mean_on + ff_lt_modis_anom_on + plot_annotation(tag_levels = 'A')
+ss4 
 ggsave("~/phenoEOS/manuscript/figures/fig_S4.png", width = 7.5, height = 4, dpi=300)
 ggsave("~/phenoEOS/manuscript/figures/fig_S4_rev.png", width = 7.5, height = 4, dpi=300)
 

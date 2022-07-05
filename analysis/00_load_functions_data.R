@@ -252,7 +252,7 @@ ggplot_lt_off_gppnet_year <- function(x){
     theme_classic() +
     scale_y_continuous(limits = c(175,365),breaks = seq(200,350,50)) + 
     #scale_x_continuous(limits = c(min(parres13$year),max(parres13$year)), breaks = seq(1950,2015,20)) +
-    labs(x ="year", y = "EOS (DOY)")
+    labs(x ="Year", y = "EOS (DOY)")
   
   return(gg)
 }

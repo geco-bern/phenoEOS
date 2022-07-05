@@ -11,11 +11,14 @@ library(rnaturalearth)
 
 # read all sites from the FLUXNET2015
 fluxnet2015 <- read.csv("~/phenoEOS/data/fluxnet_sites/fluxnet_metadata.csv")
+fluxnet2015_citations <- read.csv("~/phenoEOS/data/fluxnet_sites/fluxnet_citations.csv")
+fluxnet2015 <- fluxnet2015 %>% left_join(fluxnet2015_citations[,c(1,8)])
 
 # filter those sites from the Northern Hemisphere and those classified as deciduous (DBF, DNF) and mixed forests (MF)
 fluxnet2015 <- fluxnet2015 %>% filter(LOCATION_LAT>=10,IGBP=="DBF"|IGBP=="DNF"|IGBP=="MF") %>% 
   rename(sitename=SITE_ID,lat=LOCATION_LAT,lon=LOCATION_LONG,ele=LOCATION_ELEV)
 fluxnet2015 %>% n_distinct() #32
+write.csv(fluxnet2015,"~/phenoEOS/data/fluxnet_sites/fluxnet_refs.csv")
 
 # read files for the selected sites at daily (DD) resolution
 setwd("~/phenoEOS/data/fluxnet_sites/FLUXNET2015")

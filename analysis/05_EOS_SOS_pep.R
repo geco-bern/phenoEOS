@@ -11,6 +11,9 @@ library(ggplot2)
 library(patchwork)
 library(jtools)
 
+# load functions for plots
+source("~/phenoEOS/analysis/00_load_functions_data.R")
+
 # read data
 df_pep <- data.table::fread("~/phenoEOS/data/DataMeta_3_Drivers_20_11_10.csv") %>% 
   as_tibble() %>% 
@@ -58,37 +61,14 @@ ff_lt_pep_off_vs_on <- gg_lt_pep_off_vs_on +
 
 ff_iav_pep_off_vs_on <- gg_iav_pep_off_vs_on +
   labs(title = "EOS ~ SOS", subtitle = "PEP data") +
-  theme(plot.background = element_rect(colour = "darkgrey", fill=NA, size=2),
+  theme(#plot.background = element_rect(colour = "darkgrey", fill=NA, size=2),
         legend.key = element_rect(fill = NA, color = NA),
         legend.position = c(.85, .25),
         legend.direction="vertical",
         legend.margin = margin(.2, .2, .2, .2),
         legend.key.size = unit(.6, 'lines')) 
 
-ss3 <- ff_lt_pep_off_vs_on_year + ff_lt_pep_off_vs_on + ff_iav_pep_off_vs_on
-ss3 + plot_annotation(tag_levels = 'A')
+ss3 <- ff_lt_pep_off_vs_on_year + ff_lt_pep_off_vs_on + ff_iav_pep_off_vs_on + plot_annotation(tag_levels = 'A')
+ss3 
 ggsave("~/phenoEOS/manuscript/figures/fig_S3.png", width = 8, height = 3, dpi=300)
 ggsave("~/phenoEOS/manuscript/figures/fig_S3_rev.png", width = 9, height = 3.5, dpi=300)
-
-
-#### Email
-# Long-term trends
-# EOS ~ SOS + Year
-fit = lmer(off ~ scale(year) + scale(on) + scale(cA_tot) + (1|id_site) + (1|species), data = df_pep, na.action = "na.exclude")
-summary(fit)
-r.squaredGLMM(fit)
-plot(allEffects(fit))
-out_fit <- allEffects(fit)
-gg_fit_off_vs_on   <- ggplot_on(out_fit)
-gg_fit_off_vs_year <- ggplot_year(out_fit)
-gg_fit_off_vs_cA_tot <- ggplot_cA_tot(out_fit)
-gg_fit_off_vs_year + gg_fit_off_vs_on + gg_fit_off_vs_cA_tot
-cor(df_pep$cA_tot,df_pep$on)
-
-(gg_lt_pep_off_vs_year1 + gg_lt_pep_off_vs_on + plot_spacer())/(gg_fit_off_vs_year + gg_fit_off_vs_on + gg_fit_off_vs_cA_tot) + plot_annotation(tag_levels = 'A')
-ggsave("~/phenoEOS/manuscript/figures/fig_test.png", width = 8, height = 5, dpi=300)
-
-fit2 = lmer(on ~ scale(year) + scale(cA_tot) + (1|id_site) + (1|species), data = df_pep, na.action = "na.exclude")
-summary(fit2)
-r.squaredGLMM(fit2)
-plot(allEffects(fit2))

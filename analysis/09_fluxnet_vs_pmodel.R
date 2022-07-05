@@ -1,4 +1,6 @@
-# This script compares gpp from fluxnet sites with gpp simulations from p-model
+# This script compares gpp from fluxnet sites with gpp simulations from p-model. Outputs include Figure S6.
+# This script also compares Anet values estimated from observations and simulations. Outputs include Figure S6.
+# This script also combines plots for Figure S7.
 
 # load packages
 library(dplyr)
@@ -256,9 +258,14 @@ ppS6_GPP
 ggsave("~/phenoEOS/manuscript/figures/ppS6_GPP_rev.png", width = 7.5, height = 7.5, dpi=300)
 
 # join plots from Fluxnet observations and P-model simulations analyses
-ppS7 <- gg_flux_mean_gppnet + gg_flux_anom_gppnet + gg_pmodel_mean_gppnet + gg_pmodel_anom_gppnet + 
+ppS6 <- gg_flux_mean_gppnet + gg_flux_anom_gppnet + gg_pmodel_mean_gppgross + gg_pmodel_anom_gppgross + 
   plot_layout(ncol = 2) +
   plot_annotation(tag_levels = 'A') #+ plot_layout(guides = "collect") & theme(legend.position = 'left')
-ppS7
-ggsave("~/phenoEOS/manuscript/figures/fig_S7_rev.png", width = 7.5, height = 7.5, dpi=300)
+ppS6
+ggsave("~/phenoEOS/manuscript/figures/fig_S6_gross_rev.png", width = 8, height = 8, dpi=300)
 
+ppS6 <- gg_pmodel_mean_gppnet + gg_pmodel_anom_gppnet + 
+  plot_layout(ncol = 2) +
+  plot_annotation(tag_levels = 'A') #+ plot_layout(guides = "collect") & theme(legend.position = 'left')
+ppS6
+ggsave("~/phenoEOS/manuscript/figures/fig_S7_net_rev.png", width = 7.5, height = 4, dpi=300)
