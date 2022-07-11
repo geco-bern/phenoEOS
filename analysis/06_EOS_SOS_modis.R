@@ -18,18 +18,8 @@ source("~/phenoEOS/analysis/00_load_functions_data.R")
 # read phenology dates from MODIS
 modis_pheno_sites <- readRDS("~/phenoEOS/data/modis_pheno_sites.rds")
 
-# read p-model outputs
-modis_pmodel <- readRDS("~/phenoEOS/data/modis_pmodel_outputs.rds")
-modis_pmodel <- modis_pmodel %>% 
-  mutate(gpp_net = gpp - rd, 
-         lue = gpp / apar)
-
-# join datasets
-df_modis <- modis_pheno_sites %>% 
-  left_join(modis_pmodel[,2:10], by = c("lon","lat","year"))
-
 # Select the pheno band
-df_modis <- df_modis %>% rename(on = SOS_2_doy, off = EOS_2_doy) %>% filter(off>on)
+df_modis <- modis_pheno_sites %>% rename(on = SOS_2_doy, off = EOS_2_doy) %>% filter(off>on)
 
 # Interannual variation (IAV)
 # EOS ~ SOS
@@ -85,6 +75,4 @@ ff_lt_modis_anom_on <- gg_lt_modis_anom_on +
 
 ss4 <- ff_lt_modis_mean_on + ff_lt_modis_anom_on + plot_annotation(tag_levels = 'A')
 ss4 
-ggsave("~/phenoEOS/manuscript/figures/fig_S4.png", width = 7.5, height = 4, dpi=300)
 ggsave("~/phenoEOS/manuscript/figures/fig_S4_rev.png", width = 7.5, height = 4, dpi=300)
-

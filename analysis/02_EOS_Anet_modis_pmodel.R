@@ -24,14 +24,14 @@ source("~/phenoEOS/analysis/00_load_functions_data.R")
 modis_pheno_sites <- readRDS("~/phenoEOS/data/modis_pheno_sites.rds")
 
 # read p-model outputs
-modis_pmodel <- readRDS("~/phenoEOS/data/modis_pmodel_outputs.rds") #11.2h
+modis_pmodel <- readRDS("~/phenoEOS/data/modis_pmodel_Anet.rds") #11.2h
 modis_pmodel <- modis_pmodel %>% 
-  mutate(gpp_net = gpp - rd, 
-         lue = gpp / apar)
+  mutate(gpp_net = Anet_pmodel - rd_pmodel) %>%
+  mutate(gpp_net=ifelse(gpp_net==0, NA, gpp_net))
 
 # join datasets
 df_modis <- modis_pheno_sites %>% 
-  left_join(modis_pmodel[,2:10], by = c("lon","lat","year"))
+  left_join(modis_pmodel)
 
 # Select the pheno band
 df_modis <- df_modis %>% rename(on = SOS_2_doy, off = EOS_2_doy) %>% filter(off>on)
@@ -87,7 +87,6 @@ trend_unscaled <- out$coefficients["scale(anom_gpp_net)","Estimate"]/ sd(df_modi
 error_unscaled <- out$coefficients["scale(anom_gpp_net)","Std. Error"]/ sd(df_modis$anom_gpp_net)
 
 # Figure 2
-# Plots
 ff_modis_mean_gppnet <- gg_modis_mean_gppnet +
   labs(title = expression(paste("EOS ~ ", bold("Mean "), bolditalic("A")[bold(net)], 
                                 " + Anomalies ", italic("A")[net])), subtitle = "MODIS data and P-model") +
@@ -142,11 +141,11 @@ map_gpp <- ggplot(data = world) +
   coord_sf(xlim = c(-180, 180), ylim = c(15, 75), expand = F) +
   geom_point(data = df_modis_agg, aes(x = lon, y = lat, color = mean_gpp),size=.3) +
   labs(color=expression(paste(italic("A")[net], " (gC m"^-2, " yr"^-1, ")"))) +
-  scale_color_viridis(option="magma",limits=c(900,3500), breaks= seq(1000,3500,500)) +
+  #scale_color_viridis(option="magma",limits=c(900,3500), breaks= seq(1000,3500,500)) +
+  scale_color_viridis(option="magma",limits=c(650,2550), breaks= seq(1000,2500,500)) +
   theme(legend.position="right", panel.background = element_rect(fill = "aliceblue"),axis.title=element_blank(),plot.title = element_text(size = 10))
 
 pp2 <- (ff_modis_mean_gppnet + ff_modis_anom_gppnet)/ map_eos / map_gpp +
  plot_annotation(tag_levels = 'A') + plot_layout(heights = c(1.5, 1, 1),widths = c(2, 1, 1))
 pp2
-ggsave("~/phenoEOS/manuscript/figures/fig_2.png", width = 9, height = 8, dpi=300)
 ggsave("~/phenoEOS/manuscript/figures/fig_2_rev.png", width = 9, height = 8, dpi=300)

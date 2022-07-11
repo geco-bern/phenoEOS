@@ -1,3 +1,4 @@
+# This script runs the p-model for the selected sites given by the flux measurements.
 
 library(dplyr)
 library(tidyr)
@@ -11,19 +12,16 @@ install.packages("rpmodel")
 library(rsofun)
 
 # load data
-
 # from sofunCalVal repository (https://github.com/computationales/sofunCalVal/blob/main/data/df_drivers_fluxnet2015_allsites.rda)
 load("~/phenoEOS/data/fluxnet_sites/p_model/df_drivers_fluxnet2015.rda")
 df_drivers_fluxnet2015 %>% n_distinct() #129
 
 # select sites within the FLUXNET2015
-fluxnet2015 <- read.csv("~/phenoEOS/data/fluxnet_sites/fluxnet_metadata.csv")
-fluxnet2015 <- fluxnet2015 %>% filter(LOCATION_LAT>=10,IGBP=="DBF"|IGBP=="DNF"|IGBP=="MF") %>% 
-  rename(sitename=SITE_ID,lat=LOCATION_LAT,lon=LOCATION_LONG,ele=LOCATION_ELEV)
-fluxnet2015 %>% n_distinct() #32
+fluxnet_refs <- read.csv("~/phenoEOS/data/fluxnet_sites/fluxnet_refs.csv")
+fluxnet_refs %>% n_distinct() #32
 
 # sites for which there are drivers
-df_drivers_fluxnet2015 %>% dplyr::filter(sitename %in% fluxnet2015$sitename) %>% n_distinct() #23
+df_drivers_fluxnet2015 %>% dplyr::filter(sitename %in% fluxnet_refs$sitename) %>% n_distinct() #23
 
 # convert data to adhere to new p-model naming conventions
 drivers <- df_drivers_fluxnet2015 %>%
@@ -57,7 +55,7 @@ drivers <- df_drivers_fluxnet2015 %>%
 
 # filter sites selected
 drivers <- drivers %>%
-  dplyr::filter(sitename %in% fluxnet2015$sitename) 
+  dplyr::filter(sitename %in% fluxnet_refs$sitename) 
 
 # set p-model settings
 params_modl <- list(
@@ -78,47 +76,13 @@ output <- rsofun::runread_pmodel_f(
 output %>%
   tidyr::unnest(c(data))
 
-model_data <- output %>%
+model_output <- output %>%
   tidyr::unnest(c(site_info, data))
-str(model_data)
-
-#ggplot() + geom_line(data = model_data, aes(date, gpp),colour = "red") 
 
 # prepare variables 
-model_data <-  model_data %>% 
+model_output <-  model_output %>% 
   mutate(year=lubridate::year(date),
          doy=lubridate::yday(date),
          daylength=daylength(lat, doy))
-length(unique(model_data$sitename))
-saveRDS(model_data, "~/phenoEOS/data/fluxnet_sites/p_model/model_data.rds")
-#model_data <- readRDS("~/phenoEOS/data/fluxnet_sites/p_model/model_data.rds")
-
-# aggregate gpp data summing up to the cutoff
-# Option 1 cutoff
-daylength_cutoff <- 11.2
-
-df_out_11h <- model_data %>%
-  mutate(gpp   = ifelse(daylength <= daylength_cutoff, 0, gpp),
-         rd    = ifelse(daylength <= daylength_cutoff, 0, rd))
-
-df_out_11h <- df_out_11h %>% 
-  group_by(sitename, lat, lon, year) %>% 
-  summarise(
-    gpp = sum(gpp),
-    rd = sum(rd)
-  )
-saveRDS(df_out_11h, "~/phenoEOS/data/fluxnet_sites/p_model/flux_pmodel_11h_output.rds")
-
-# Option 2 cutoff
-#doy_cutoff <- lubridate::yday("2001-06-21") 
-
-#df_out_21J <- model_data %>%
-#  mutate(gpp   = ifelse(doy >= doy_cutoff, 0, gpp))
-
-#df_out_21J <- df_out_21J %>% 
-#  group_by(sitename, lat, lon, year) %>% 
-#  summarise(
-#    gpp = sum(gpp)
-#  )
-#saveRDS(df_out_21J, "~/phenoEOS/data/flux_sites/p-model/p_model_drivers/flux_pmodel_21J_output.rds")
-
+length(unique(model_output$sitename))
+saveRDS(model_output, "~/phenoEOS/data/fluxnet_sites/p_model/model_output.rds")

@@ -23,12 +23,11 @@ df_pep <- data.table::fread("~/phenoEOS/data/DataMeta_3_Drivers_20_11_10.csv") %
   mutate(id_site=as.character(id_site))
 
 # read data pep P-model
-pep_pmodel <- readRDS("~/phenoEOS/data/pep_pmodel_outputs.rds") #11.2h
+pep_pmodel <- readRDS("~/phenoEOS/data/pep_pmodel_Anet.rds") #11.2h
 pep_pmodel <- pep_pmodel %>% 
-  mutate(gpp_net = gpp - rd, 
-         lue = gpp / apar)
+  mutate(gpp_net = Anet_pmodel - rd_pmodel) %>%
+  mutate(gpp_net=ifelse(gpp_net==0, NA, gpp_net))
 
-# join both datasets
 df_pep <- df_pep %>% 
   left_join(pep_pmodel)
 
@@ -76,13 +75,11 @@ ff_iav_pep_off_vs_gppnet <- gg_iav_pep_off_vs_gppnet +
   labs(title = expression(paste("EOS ~ ", italic("A")[net])), subtitle = "PEP data and P-model") +
   theme(#plot.background = element_rect(colour = "darkgrey", fill=NA, size=2),
         legend.key = element_rect(fill = NA, color = NA),
-        legend.position = c(.15, .25),
+        legend.position = c(.15, .20),
         legend.direction="vertical",
-        legend.margin = margin(.2, .2, .2, .2),
-        legend.key.size = unit(.6, 'lines')) 
+        legend.margin = margin(.1, .1, .1, .1),
+        legend.key.size = unit(.45, 'lines')) 
 
 ss2 <- ff_lt_pep_off_vs_gppnet_year + ff_lt_pep_off_vs_gppnet + ff_iav_pep_off_vs_gppnet + plot_annotation(tag_levels = 'A')
 ss2 
-ggsave("~/phenoEOS/manuscript/figures/fig_S2.png", width = 8, height = 3, dpi=300)
 ggsave("~/phenoEOS/manuscript/figures/fig_S2_rev.png", width = 9, height = 3.5, dpi=300)
-

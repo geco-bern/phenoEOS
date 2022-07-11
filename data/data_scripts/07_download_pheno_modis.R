@@ -1,5 +1,4 @@
-# This script downloads the phenology dates from the MODIS product MCD12Q2 and for the 
-# sites given by the flux measurements.
+# This script downloads the phenology dates from the MODIS product MCD12Q2 and for the sites given by the flux measurements.
 
 # load packages
 library(MODISTools)
@@ -12,32 +11,26 @@ products <- mt_products()
 ## List available bands for a product
 bands <- mt_bands(product = "MCD12Q2")
 
-# read flux sites
-#df_flux_sites <- readRDS("~/phenoEOS/data/flux_sites/df_flux_sites.rds")
-
-fluxnet2015 <- read.csv("~/phenoEOS/data/fluxnet_sites/fluxnet_metadata.csv")
-fluxnet2015 <- fluxnet2015 %>% filter(LOCATION_LAT>=10,IGBP=="DBF"|IGBP=="DNF"|IGBP=="MF") %>% 
-  rename(sitename=SITE_ID,lat=LOCATION_LAT,lon=LOCATION_LONG,ele=LOCATION_ELEV)
-length(unique(fluxnet2015$sitename))
-df_flux_sites <- fluxnet2015
+fluxnet_refs <- read.csv("~/phenoEOS/data/fluxnet_sites/fluxnet_refs.csv")
+length(unique(fluxnet_refs$sitename))
 
 # run mt_subset fc for more than one site 
 # See that the result of phenological dates is recorded in the variable value, express as POSIXt, i.e., # days since 01/01/1970
 df_modistools <- data.frame() 
 
-for(i in 1:nrow(df_flux_sites)) {
+for(i in 1:nrow(fluxnet_refs)) {
   
   df_modistools_sub <- mt_subset(
     product = "MCD12Q2",
-    lat = df_flux_sites$lat[i],
-    lon = df_flux_sites$lon[i],
+    lat = fluxnet_refs$lat[i],
+    lon = fluxnet_refs$lon[i],
     band = c("Greenup.Num_Modes_01","Dormancy.Num_Modes_01",
              "MidGreenup.Num_Modes_01","MidGreendown.Num_Modes_01"),
     start = "2001-01-01",
     end = "2018-01-01",
     km_lr = 0,
     km_ab = 0,
-    site_name = df_flux_sites$sitename[i],
+    site_name = fluxnet_refs$sitename[i],
     internal = TRUE,
     progress = FALSE)
   
@@ -57,7 +50,7 @@ df_modistools_wide <- df_modistools %>%
 length(unique(df_modistools_wide$site))
 
 # Convert value output to DOY
-df_pheno_modis <- df_modistools_wide %>%
+df_pheno_modis_fluxnet <- df_modistools_wide %>%
   mutate(year=year(calendar_date)) %>%
   # drop fill values (not relevant for Northern Hemisphere)
   dplyr::filter(Greenup.Num_Modes_01 <= 32766) %>% 
@@ -83,7 +76,7 @@ df_pheno_modis <- df_modistools_wide %>%
   relocate(site) %>%
   rename(sitename=site)
 
-length(unique(df_pheno_modis$sitename))
+length(unique(df_pheno_modis_fluxnet$sitename))
 
 # save data
-saveRDS(df_pheno_modis, "~/phenoEOS/data/fluxnet_sites/df_modis_pheno_flux.rds")
+saveRDS(df_pheno_modis_fluxnet, "~/phenoEOS/data/fluxnet_sites/df_pheno_modis_fluxnet.rds")

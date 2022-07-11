@@ -5,31 +5,81 @@ library(dplyr)
 library(lubridate)
 library(geosphere)
 
+# Aggregate Anet from flux measurements ####
+
 # read flux data
-df_fluxnet_agg <- readRDS("~/phenoEOS/data/fluxnet_sites/df_fluxnet_agg.rds")
-df_fluxnet_agg <- df_fluxnet_agg %>% rename(gpp_flux=gpp_11h)
-length(unique(df_fluxnet_agg$sitename)) 
+fluxnet_data <- readRDS("~/phenoEOS/data/fluxnet_sites/fluxnet_data.rds")
+str(fluxnet_data)
 
-# read pheno modis data for the selected flux sites
-# this data has been downloaded using MODISTools (can be also done using ingestr) (from the product MCD12Q2)
-df_modis_pheno_flux <- readRDS("~/phenoEOS/data/fluxnet_sites/df_modis_pheno_flux.rds")
-length(unique(df_modis_pheno_flux$sitename)) 
-df_modis_pheno_flux <- df_modis_pheno_flux %>% select(sitename,year,SOS_1_date,SOS_1_doy,SOS_2_date,
-                                            SOS_2_doy,EOS_1_date,EOS_1_doy,EOS_2_date,EOS_2_doy)
+# read pheno modis data
+df_pheno_modis_fluxnet <- readRDS("~/phenoEOS/data/fluxnet_sites/df_pheno_modis_fluxnet.rds")
+df_pheno_modis_fluxnet <- df_pheno_modis_fluxnet %>% select(sitename,year,SOS_1_date,SOS_1_doy,SOS_2_date,
+                                                      SOS_2_doy,EOS_1_date,EOS_1_doy,EOS_2_date,EOS_2_doy)
+# join datasets
+fluxnet_pheno_join <- fluxnet_data %>% left_join(df_pheno_modis_fluxnet[,c(1,2,6)])
 
-# read p-model simulations
-df_out_11h <- readRDS("~/phenoEOS/data/fluxnet_sites/p_model/flux_pmodel_11h_output.rds")
-df_out_11h <- df_out_11h %>% rename(gpp_pmodel=gpp)
+# aggregate gpp data summing from SOS up to the cutoff
+daylength_cutoff <- 11.2
 
-# join the three datasets
-data_flux_modis_pmodel <- df_fluxnet_agg %>% left_join(df_modis_pheno_flux) %>% left_join(df_out_11h)
-length(unique(data_flux_modis_pmodel$sitename))
-saveRDS(data_flux_modis_pmodel, "~/phenoEOS/data/data_flux_modis_pmodel.rds")
-saveRDS(data_flux_modis_pmodel, "~/phenoEOS/data/data_flux_modis_pmodel2.rds")
+fluxnet_pheno_join <- fluxnet_pheno_join %>%
+  mutate(Anet_flux = ifelse(!is.na(gpp) & (doy < SOS_2_doy | daylength <= daylength_cutoff), 0, gpp)) 
 
-table(df_fluxnet_agg$year)
-table(df_modis_pheno_flux$year)
-table(df_out_11h$year)
-table(df_fluxnet_agg$sitename)
-table(df_modis_pheno_flux$sitename)
-table(df_out_11h$sitename)
+df_fluxnet_Anet <- fluxnet_pheno_join %>% 
+  group_by(sitename, year) %>% 
+  summarise(Anet_flux = sum(Anet_flux,na.rm = F)) %>%
+  mutate(Anet_flux=ifelse(Anet_flux<=0,NA,Anet_flux))
+length(unique(df_fluxnet_Anet$sitename))
+
+table(df_fluxnet_Anet$year)
+sort(table(df_fluxnet_Anet$sitename))
+df_fluxnet_Anet <- df_fluxnet_Anet %>% 
+  group_by(sitename) %>%
+  mutate(n_years = n()) %>%
+  ungroup() %>%
+  filter(n_years >= 10)
+length(unique(df_fluxnet_Anet$sitename))
+
+# Aggregate Anet from p-model simulations ####
+
+# read p-model outputs
+model_output <- readRDS("~/phenoEOS/data/fluxnet_sites/p_model/model_output.rds")
+model_output <- model_output %>% select(sitename,lon,lat,year,doy,daylength,fapar,iwue,gpp,rd)
+
+# read pheno modis data
+df_pheno_modis_fluxnet <- readRDS("~/phenoEOS/data/fluxnet_sites/df_pheno_modis_fluxnet.rds")
+df_pheno_modis_fluxnet <- df_pheno_modis_fluxnet %>% select(sitename,year,SOS_1_date,SOS_1_doy,SOS_2_date,
+                                                            SOS_2_doy,EOS_1_date,EOS_1_doy,EOS_2_date,EOS_2_doy)
+# join datasets
+pmodel_pheno_join <- model_output %>% left_join(df_pheno_modis_fluxnet[,c(1,2,6)])
+
+# aggregate gpp data summing up to the cutoff
+daylength_cutoff <- 11.2
+
+pmodel_pheno_join <- pmodel_pheno_join %>%
+  mutate(Anet_pmodel = ifelse(!is.na(gpp) & (doy < SOS_2_doy | daylength <= daylength_cutoff), 0, gpp)) %>%
+  mutate(rd_pmodel = ifelse(!is.na(gpp) & (doy < SOS_2_doy | daylength <= daylength_cutoff), 0, rd)) 
+
+df_pmodel_Anet <- pmodel_pheno_join %>% 
+  group_by(sitename, lat, lon, year) %>% 
+  summarise(Anet_pmodel = sum(Anet_pmodel,na.rm = F),
+            rd_pmodel = sum(rd_pmodel,na.rm = F)) %>%
+  mutate(Anet_pmodel=ifelse(Anet_pmodel<=0,NA,Anet_pmodel))
+length(unique(df_pmodel_Anet$sitename))
+
+table(df_pmodel_Anet$year)
+sort(table(df_pmodel_Anet$sitename))
+df_pmodel_Anet <- df_pmodel_Anet %>% 
+  group_by(sitename) %>%
+  mutate(n_years = n()) %>%
+  ungroup() %>%
+  filter(n_years >= 10)
+length(unique(df_pmodel_Anet$sitename))
+
+# Join all data fluxnet_pmodel_pheno ####
+
+fluxnet_pmodel_pheno <- df_fluxnet_Anet %>% left_join(df_pmodel_Anet, by = c("sitename", "year")) %>% 
+  left_join(df_pheno_modis_fluxnet, by = c("sitename", "year"))
+length(unique(fluxnet_pmodel_pheno$sitename))
+saveRDS(fluxnet_pmodel_pheno, "~/phenoEOS/data/fluxnet_pmodel_pheno.rds")
+table(fluxnet_pmodel_pheno$year)
+sort(table(fluxnet_pmodel_pheno$sitename))

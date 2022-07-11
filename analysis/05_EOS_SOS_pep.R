@@ -70,5 +70,4 @@ ff_iav_pep_off_vs_on <- gg_iav_pep_off_vs_on +
 
 ss3 <- ff_lt_pep_off_vs_on_year + ff_lt_pep_off_vs_on + ff_iav_pep_off_vs_on + plot_annotation(tag_levels = 'A')
 ss3 
-ggsave("~/phenoEOS/manuscript/figures/fig_S3.png", width = 8, height = 3, dpi=300)
 ggsave("~/phenoEOS/manuscript/figures/fig_S3_rev.png", width = 9, height = 3.5, dpi=300)

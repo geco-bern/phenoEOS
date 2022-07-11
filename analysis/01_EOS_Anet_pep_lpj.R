@@ -110,5 +110,4 @@ ff_iav_pep_off_vs_cAtot <- gg_iav_pep_off_vs_cAtot +
 pp1 <- ff_lt_pep_off_vs_year + ff_lt_pep_off_vs_cAtot + ff_iav_pep_off_vs_cAtot +
  plot_annotation(tag_levels = 'A') #+ plot_layout(guides = "collect") & theme(legend.position = 'left')
 pp1
-ggsave("~/phenoEOS/manuscript/figures/fig_1.png", width = 8, height = 3, dpi=300)
 ggsave("~/phenoEOS/manuscript/figures/fig_1_rev.png", width = 9, height = 3.5, dpi=300)

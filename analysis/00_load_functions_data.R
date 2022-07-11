@@ -189,7 +189,8 @@ ggplot_gppnet_year <- function(x){
     geom_ribbon(data = df, aes(x = year, ymin = lower, ymax = upper), alpha = 0.2, fill = "black") +
     geom_line(data = df, aes(year, gpp_net), col = "black",size=.8) +
     theme_classic() +
-    scale_y_continuous(limits = c(1350,2350),breaks = seq(1500,2500,250)) + 
+    #scale_y_continuous(limits = c(1350,2350),breaks = seq(1500,2500,250)) + 
+    scale_y_continuous(limits = c(300,2200),breaks = seq(500,2000,500)) + 
     #scale_x_continuous(limits = c(min(parres10$year),max(parres10$year)), breaks = seq(1950,2020,20)) +
     labs(x = "Year", y = "gpp_net")
   return(gg)

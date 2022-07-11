@@ -23,12 +23,11 @@ df_pep <- data.table::fread("~/phenoEOS/data/DataMeta_3_Drivers_20_11_10.csv") %
   mutate(id_site=as.character(id_site))
 
 # read data pep P-model
-pep_pmodel <- readRDS("~/phenoEOS/data/pep_pmodel_outputs.rds") #11.2h
+pep_pmodel <- readRDS("~/phenoEOS/data/pep_pmodel_Anet.rds") #11.2h
 pep_pmodel <- pep_pmodel %>% 
-  mutate(gpp_net = gpp - rd, 
-         lue = gpp / apar)
+  mutate(gpp_net = Anet_pmodel - rd_pmodel) %>%
+  mutate(gpp_net=ifelse(gpp_net==0, NA, gpp_net))
 
-# join both datasets
 df_pep <- df_pep %>% 
   left_join(pep_pmodel)
 
@@ -63,7 +62,7 @@ gg_lt_pep_cAtot_vs_year <- ggplot_catot_year(out_lt_pep_cAtot_vs_year)
 gg_lt_pep_cAtot_vs_year
 
 # Anet P-model ~ Year
-fit_lt_pep_gppnet_vs_year <- lmer(gpp_net ~ scale(year) + (1|id_site) + (1|species), data = df_pep, na.action = "na.exclude")
+fit_lt_pep_gppnet_vs_year <- lmer(gpp_net ~ scale(year) + (1|id_site) + (1|species), data = df_pep, REML = FALSE, na.action = "na.exclude")
 summary(fit_lt_pep_gppnet_vs_year)
 r.squaredGLMM(fit_lt_pep_gppnet_vs_year)
 plot(allEffects(fit_lt_pep_gppnet_vs_year))
@@ -96,8 +95,6 @@ ff_lt_pep_on_vs_year <- gg_lt_pep_on_vs_year +
         legend.margin = margin(.2, .2, .2, .2),
         legend.key.size = unit(.6, 'lines'))
 
-ss1 <- (ff_lt_pep_off_vs_year + ff_lt_pep_cAtot_vs_year)/(ff_lt_pep_gppnet_vs_year + ff_lt_pep_on_vs_year)
-ss1 + plot_annotation(tag_levels = 'A')
-ggsave("~/phenoEOS/manuscript/figures/fig_S1.png", width = 7.5, height = 7.5, dpi=300)
+ss1 <- (ff_lt_pep_off_vs_year + ff_lt_pep_cAtot_vs_year)/(ff_lt_pep_gppnet_vs_year + ff_lt_pep_on_vs_year) + plot_annotation(tag_levels = 'A')
+ss1 
 ggsave("~/phenoEOS/manuscript/figures/fig_S1_rev.png", width = 7.5, height = 7.5, dpi=300)
-
