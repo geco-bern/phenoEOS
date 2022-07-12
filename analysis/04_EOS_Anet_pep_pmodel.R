@@ -35,12 +35,18 @@ df_pep <- df_pep %>%
 # EOS ~ Anet P-model
 fit_iav_pep_off_vs_gppnet = lmer(off ~ scale(gpp_net) + (1|id_site) + (1|species), data = df_pep, na.action = "na.exclude")
 summary(fit_iav_pep_off_vs_gppnet)
+out <- summary(fit_iav_pep_off_vs_gppnet)
 r.squaredGLMM(fit_iav_pep_off_vs_gppnet)
 plot(allEffects(fit_iav_pep_off_vs_gppnet))
 parres11 <- partialize(fit_iav_pep_off_vs_gppnet,"gpp_net")
 out_pep_off_vs_gppnet <- allEffects(fit_iav_pep_off_vs_gppnet)
 gg_iav_pep_off_vs_gppnet <- ggplot_iav_off_gppnet(out_pep_off_vs_gppnet)
 gg_iav_pep_off_vs_gppnet
+# Unscaled
+trend_unscaled <- out$coefficients["scale(gpp_net)","Estimate"]/ sd(df_pep$gpp_net)
+error_unscaled <- out$coefficients["scale(gpp_net)","Std. Error"]/ sd(df_pep$gpp_net)
+upperCI_unscaled <- out$coefficients["scale(gpp_net)","Estimate"]/ sd(df_pep$gpp_net) + out$coefficient["scale(gpp_net)","Std. Error"]/ sd(df_pep$gpp_net)*1.96
+lowerCI_unscaled <- out$coefficients["scale(gpp_net)","Estimate"]/ sd(df_pep$gpp_net) - out$coefficient["scale(gpp_net)","Std. Error"]/ sd(df_pep$gpp_net)*1.96
 
 # Long-term trends
 # EOS ~ Anet P-model + Year 
@@ -57,6 +63,16 @@ out_pep_off_vs_gppnet_year <- allEffects(fit_lt_pep_off_vs_gppnet_year)
 gg_lt_pep_off_vs_gppnet <- ggplot_lt_off_gppnet(out_pep_off_vs_gppnet_year)
 gg_lt_pep_off_vs_gppnet_year <- ggplot_lt_off_gppnet_year(out_pep_off_vs_gppnet_year)
 gg_lt_pep_off_vs_gppnet + gg_lt_pep_off_vs_gppnet_year
+# Unscaled
+trend_unscaled <- out$coefficients["scale(year)","Estimate"]/ sd(df_pep$year)
+error_unscaled <- out$coefficients["scale(year)","Std. Error"]/ sd(df_pep$year)
+upperCI_unscaled <- out$coefficients["scale(year)","Estimate"]/ sd(df_pep$year) + out$coefficient["scale(year)","Std. Error"]/ sd(df_pep$year)*1.96
+lowerCI_unscaled <- out$coefficients["scale(year)","Estimate"]/ sd(df_pep$year) - out$coefficient["scale(year)","Std. Error"]/ sd(df_pep$year)*1.96
+
+trend_unscaled <- out$coefficients["scale(gpp_net)","Estimate"]/ sd(df_pep$gpp_net)
+error_unscaled <- out$coefficients["scale(gpp_net)","Std. Error"]/ sd(df_pep$gpp_net)
+upperCI_unscaled <- out$coefficients["scale(gpp_net)","Estimate"]/ sd(df_pep$gpp_net) + out$coefficient["scale(gpp_net)","Std. Error"]/ sd(df_pep$gpp_net)*1.96
+lowerCI_unscaled <- out$coefficients["scale(gpp_net)","Estimate"]/ sd(df_pep$gpp_net) - out$coefficient["scale(gpp_net)","Std. Error"]/ sd(df_pep$gpp_net)*1.96
 
 # Model comparison interannual vs. long-term
 out_anova <- anova(fit_iav_pep_off_vs_gppnet, fit_lt_pep_off_vs_gppnet_year)

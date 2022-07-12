@@ -121,10 +121,10 @@ ggplot_anom_gppnet <- function(x){
 
 # Plot effects of EOS ~ Year: fit_lt_pep_off_vs_year
 ggplot_off_year <- function(x){
-  df <- tibble(upper = x$`year`$upper[,1],
-               lower = x$`year`$lower[,1],
-               off = x$`year`$fit[,1],
-               year = x$`year`$x[,1])
+  df <- tibble(upper = x$`scale(year)`$upper[,1],
+               lower = x$`scale(year)`$lower[,1],
+               off = x$`scale(year)`$fit[,1],
+               year = x$`scale(year)`$x[,1])
   gg <- ggplot() + 
     geom_hex(data = parres7, aes(year, off),bins = 60) + 
     scale_fill_gradientn("",colours = alpha(colorRampPalette( c("gray65", "navy", "red", "yellow"))(5),.7),
@@ -140,10 +140,10 @@ ggplot_off_year <- function(x){
 
 # Plot effects of SOS ~ Year: fit_lt_pep_on_vs_year
 ggplot_on_year <- function(x){
-  df <- tibble(upper = x$`year`$upper[,1],
-               lower = x$`year`$lower[,1],
-               on = x$`year`$fit[,1],
-               year = x$`year`$x[,1])
+  df <- tibble(upper = x$`scale(year)`$upper[,1],
+               lower = x$`scale(year)`$lower[,1],
+               on = x$`scale(year)`$fit[,1],
+               year = x$`scale(year)`$x[,1])
   gg <- ggplot() + 
     geom_hex(data = parres8, aes(year, on),bins = 60) + 
     scale_fill_gradientn("",colours = alpha(colorRampPalette( c("gray65", "navy", "red", "yellow"))(5),.7),

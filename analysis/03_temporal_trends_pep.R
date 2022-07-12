@@ -32,17 +32,21 @@ df_pep <- df_pep %>%
   left_join(pep_pmodel)
 
 # EOS ~ Year
-fit_lt_pep_off_vs_year <- lmer(off ~ year + (1|id_site) + (1|species), data = df_pep, na.action = "na.exclude")
+fit_lt_pep_off_vs_year <- lmer(off ~ scale(year) + (1|id_site) + (1|species), data = df_pep, na.action = "na.exclude")
 summary(fit_lt_pep_off_vs_year)
+out <- summary(fit_lt_pep_off_vs_year)
 r.squaredGLMM(fit_lt_pep_off_vs_year)
 plot(allEffects(fit_lt_pep_off_vs_year))
 parres7 <- partialize(fit_lt_pep_off_vs_year,"year")
 out_lt_pep_off_vs_year <- allEffects(fit_lt_pep_off_vs_year)
 gg_lt_pep_off_vs_year <- ggplot_off_year(out_lt_pep_off_vs_year)
 gg_lt_pep_off_vs_year
+# Unscaled
+trend_unscaled <- out$coefficients["scale(year)","Estimate"]/ sd(df_pep$year)
+error_unscaled <- out$coefficients["scale(year)","Std. Error"]/ sd(df_pep$year)
 
 # SOS ~ Year
-fit_lt_pep_on_vs_year <- lmer(on ~ year + (1|id_site) + (1|species), data = df_pep, na.action = "na.exclude")
+fit_lt_pep_on_vs_year <- lmer(on ~ scale(year) + (1|id_site) + (1|species), data = df_pep,REML = F, na.action = "na.exclude")
 summary(fit_lt_pep_on_vs_year)
 r.squaredGLMM(fit_lt_pep_on_vs_year)
 plot(allEffects(fit_lt_pep_on_vs_year))
@@ -54,12 +58,16 @@ gg_lt_pep_on_vs_year
 # Anet LPJ-GUESS ~ Year
 fit_lt_pep_cAtot_vs_year <- lmer(cA_tot ~ scale(year) + (1|id_site) + (1|species), data = df_pep, na.action = "na.exclude")
 summary(fit_lt_pep_cAtot_vs_year)
+out <- summary(fit_lt_pep_cAtot_vs_year)
 r.squaredGLMM(fit_lt_pep_cAtot_vs_year)
 plot(allEffects(fit_lt_pep_cAtot_vs_year))
 parres9 <- partialize(fit_lt_pep_cAtot_vs_year,"year")
 out_lt_pep_cAtot_vs_year <- allEffects(fit_lt_pep_cAtot_vs_year)
 gg_lt_pep_cAtot_vs_year <- ggplot_catot_year(out_lt_pep_cAtot_vs_year)
 gg_lt_pep_cAtot_vs_year
+# Unscaled
+trend_unscaled <- out$coefficients["scale(year)","Estimate"]/ sd(df_pep$year)
+error_unscaled <- out$coefficients["scale(year)","Std. Error"]/ sd(df_pep$year)
 
 # Anet P-model ~ Year
 fit_lt_pep_gppnet_vs_year <- lmer(gpp_net ~ scale(year) + (1|id_site) + (1|species), data = df_pep, REML = FALSE, na.action = "na.exclude")

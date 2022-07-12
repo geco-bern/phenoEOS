@@ -83,3 +83,5 @@ length(unique(fluxnet_pmodel_pheno$sitename))
 saveRDS(fluxnet_pmodel_pheno, "~/phenoEOS/data/fluxnet_pmodel_pheno.rds")
 table(fluxnet_pmodel_pheno$year)
 sort(table(fluxnet_pmodel_pheno$sitename))
+
+table(df_pheno_modis_fluxnet$year)
