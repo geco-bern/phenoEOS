@@ -3,7 +3,6 @@
 # load packages
 library(dplyr)
 library(lubridate)
-library(geosphere)
 
 # Aggregate Anet from flux measurements ####
 
@@ -29,20 +28,13 @@ df_fluxnet_Anet <- fluxnet_pheno_join %>%
   summarise(Anet_flux = sum(Anet_flux,na.rm = F)) %>%
   mutate(Anet_flux=ifelse(Anet_flux<=0,NA,Anet_flux))
 length(unique(df_fluxnet_Anet$sitename))
-
 table(df_fluxnet_Anet$year)
 sort(table(df_fluxnet_Anet$sitename))
-df_fluxnet_Anet <- df_fluxnet_Anet %>% 
-  group_by(sitename) %>%
-  mutate(n_years = n()) %>%
-  ungroup() %>%
-  filter(n_years >= 10)
-length(unique(df_fluxnet_Anet$sitename))
 
 # Aggregate Anet from p-model simulations ####
 
 # read p-model outputs
-model_output <- readRDS("~/phenoEOS/data/fluxnet_sites/p_model/model_output.rds")
+model_output <- readRDS("~/phenoEOS/data/fluxnet_sites/p_model/pmodel_output.rds")
 model_output <- model_output %>% select(sitename,lon,lat,year,doy,daylength,fapar,iwue,gpp,rd)
 
 # read pheno modis data
@@ -65,15 +57,8 @@ df_pmodel_Anet <- pmodel_pheno_join %>%
             rd_pmodel = sum(rd_pmodel,na.rm = F)) %>%
   mutate(Anet_pmodel=ifelse(Anet_pmodel<=0,NA,Anet_pmodel))
 length(unique(df_pmodel_Anet$sitename))
-
 table(df_pmodel_Anet$year)
 sort(table(df_pmodel_Anet$sitename))
-df_pmodel_Anet <- df_pmodel_Anet %>% 
-  group_by(sitename) %>%
-  mutate(n_years = n()) %>%
-  ungroup() %>%
-  filter(n_years >= 10)
-length(unique(df_pmodel_Anet$sitename))
 
 # Join all data fluxnet_pmodel_pheno ####
 
@@ -83,5 +68,3 @@ length(unique(fluxnet_pmodel_pheno$sitename))
 saveRDS(fluxnet_pmodel_pheno, "~/phenoEOS/data/fluxnet_pmodel_pheno.rds")
 table(fluxnet_pmodel_pheno$year)
 sort(table(fluxnet_pmodel_pheno$sitename))
-
-table(df_pheno_modis_fluxnet$year)

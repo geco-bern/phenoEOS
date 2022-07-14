@@ -41,6 +41,9 @@ length(unique(df_modis$sitename)) #4879
 # EOS ~ Anet P-model
 fit_iav_modis_off_vs_gppnet = lmer(off ~ scale(gpp_net) + (1|sitename) , data = df_modis, na.action = "na.exclude")
 summary(fit_iav_modis_off_vs_gppnet)
+out <- summary(fit_iav_modis_off_vs_gppnet)
+out$coefficients[,"Estimate"]
+out$coefficients[,"Std. Error"]
 r.squaredGLMM(fit_iav_modis_off_vs_gppnet)
 plot(allEffects(fit_iav_modis_off_vs_gppnet))
 parres4 <- partialize(fit_iav_modis_off_vs_gppnet,"gpp_net") # calculate partial residuals

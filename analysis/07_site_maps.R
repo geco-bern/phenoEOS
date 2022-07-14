@@ -108,4 +108,3 @@ map_modis_sites <- ggplot(data = world) +
 ffs <- map_pep_sites / map_modis_sites
 ffs + plot_annotation(tag_levels = 'A') + plot_layout(heights = c(1, 1),widths = c(1,0.7))
 ggsave("~/phenoEOS/manuscript/figures/fig_S5_rev.png", width = 9, height = 8, dpi=300)
-
