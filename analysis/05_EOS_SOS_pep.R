@@ -53,20 +53,20 @@ out_anova
 ## Supplementary Fig. S3
 ff_lt_pep_off_vs_on_year <- gg_lt_pep_off_vs_on_year +
   labs(title = expression(paste("EOS ~ ", bold("Year"), " + SOS")), subtitle = "PEP data") +
-  theme(legend.position = "none")
+  theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
 
 ff_lt_pep_off_vs_on <- gg_lt_pep_off_vs_on +
-  labs(title = expression(paste("EOS ~ Year + ", bold("SOS"))), subtitle = "PEP data") +
-  theme(legend.position = "none")
+  labs(title = expression(paste("EOS ~ Year + ", bold("SOS"))), subtitle = "") +
+  theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
 
 ff_iav_pep_off_vs_on <- gg_iav_pep_off_vs_on +
-  labs(title = "EOS ~ SOS", subtitle = "PEP data") +
+  labs(title = "EOS ~ SOS", subtitle = "") +
   theme(#plot.background = element_rect(colour = "darkgrey", fill=NA, size=2),
         legend.key = element_rect(fill = NA, color = NA),
         legend.position = c(.85, .25),
         legend.direction="vertical",
         legend.margin = margin(.2, .2, .2, .2),
-        legend.key.size = unit(.6, 'lines')) 
+        legend.key.size = unit(.6, 'lines'),plot.subtitle=element_text(size=10))  
 
 ss3 <- ff_lt_pep_off_vs_on_year + ff_lt_pep_off_vs_on + ff_iav_pep_off_vs_on + plot_annotation(tag_levels = 'A')
 ss3 

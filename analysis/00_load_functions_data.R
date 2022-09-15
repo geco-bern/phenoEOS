@@ -7,8 +7,7 @@ ggplot_iav_off_catot <- function(x){
                off = x$`scale(cA_tot)`$fit[,1],
                cA_tot = x$`scale(cA_tot)`$x[,1])
   gg <- ggplot() + 
-    geom_hex(data = parres1, aes(cA_tot, off),bins = 60) + #scale_fill_viridis(alpha=0.7,limits=c(1,4300)) +
-    #scale_fill_gradient2("",limits = c(500,4300), oob = scales::squish) +
+    geom_hex(data = parres1, aes(cA_tot, off),bins = 60) + 
     scale_fill_gradientn("",colours = alpha(colorRampPalette( c("gray65", "navy", "red", "yellow"))(5),.7),
                          trans = "log",limits=c(1,5900),breaks=c(5,50,500,4000)) +
     geom_ribbon(data = df, aes(x = cA_tot, ymin = lower, ymax = upper), alpha = 0.2, fill = "black") +
@@ -17,7 +16,6 @@ ggplot_iav_off_catot <- function(x){
     scale_y_continuous(limits = c(175,365),breaks = seq(200,350,50)) + 
     scale_x_continuous(limits = c(min(parres1$cA_tot),max(parres1$cA_tot)), breaks = seq(500,2300,500)) +
     labs(x = expression(paste(italic("A")[net], " (gC m"^-2, " yr"^-1, ")")), y = "EOS (DOY)")
-  
   return(gg)
 }
 
@@ -37,7 +35,6 @@ ggplot_lt_off_catot <- function(x){
     scale_y_continuous(limits = c(175,365),breaks = seq(200,350,50)) + 
     scale_x_continuous(limits = c(min(parres2$cA_tot),max(parres2$cA_tot)), breaks = seq(500,2300,500)) +
     labs(x = expression(paste(italic("A")[net], " (gC m"^-2, " yr"^-1, ")")), y = "EOS (DOY)")
-  
   return(gg)
 }
 
@@ -74,9 +71,7 @@ ggplot_gppnet_modis <- function(x){
     geom_line(data = df, aes(gpp_net, off), col = "black",size=.8) +
     theme_classic() +
     scale_y_continuous(limits = c(0,365),breaks = seq(50,350,100)) + 
-    #scale_x_continuous(limits = c(min(parres4$gpp_net),max(parres4$gpp_net))) +
     labs(x = expression(paste(italic("A")[net], " (gC m"^-2, " yr"^-1, ")")), y = "EOS (DOY)")
-  
   return(gg)
 }
 
@@ -91,10 +86,11 @@ ggplot_mean_gppnet <- function(x){
     scale_fill_gradientn("",colours = alpha(colorRampPalette( c("gray65", "navy", "red", "yellow"))(5),.7),
                          trans = "log",limits=c(1,5900),breaks=c(5,50,500,4000)) +
     geom_ribbon(data = df, aes(x = mean_gpp_net, ymin = lower, ymax = upper), alpha = 0.2, fill = "black") +
-    geom_line(data = df, aes(mean_gpp_net, off), col = "black",size=.8) +
+    #geom_line(data = df, aes(mean_gpp_net, off), col = "black",size=.8) +
+    geom_smooth(data = df, aes(x=mean_gpp_net, y=off),col="black", method = "lm",fullrange = T,size = .8, se=F,show.legend = F) +
     theme_classic() +
     scale_y_continuous(limits = c(0,365),breaks = seq(50,350,100)) + 
-    #scale_x_continuous(limits = c(min(parres5$mean_gpp_net),max(parres5$mean_gpp_net))) +
+    scale_x_continuous(breaks = seq(0,2500,500)) + 
     labs(x = expression(paste("Mean " ,italic("A")[net], " (gC m"^-2, " yr"^-1, ")")), y = "EOS (DOY)")
   return(gg)
 }
@@ -108,14 +104,14 @@ ggplot_anom_gppnet <- function(x){
   gg <- ggplot() + 
     geom_hex(data = parres6, aes(anom_gpp_net, off),bins = 60) + 
     scale_fill_gradientn("",colours = alpha(colorRampPalette( c("gray65", "navy", "red", "yellow"))(5),.7),
-                         trans = "log",limits=c(1,5900),breaks=c(5,50,500,4000)) + 
+                         trans = "log",limits=c(1,6350),breaks=c(5,50,500,4000)) + 
     geom_ribbon(data = df, aes(x = anom_gpp_net, ymin = lower, ymax = upper), alpha = 0.2, fill = "black") +
-    geom_line(data = df, aes(anom_gpp_net, off), col = "black",size=.8) +
+    #geom_line(data = df, aes(anom_gpp_net, off), col = "black",size=.8) +
+    geom_smooth(data = df, aes(x=anom_gpp_net, y=off),col="black", method = "lm",fullrange = T,size = .8, se=F,show.legend = F) +
     theme_classic() +
     scale_y_continuous(limits = c(0,365),breaks = seq(50,350,100)) + 
-    #scale_x_continuous(limits = c(min(parres6$anom_gpp_net),max(parres6$anom_gpp_net))) +
+    scale_x_continuous(breaks = seq(-1000,1000,500)) + 
     labs(x = expression(paste("Anomalies " ,italic("A")[net], " (gC m"^-2, " yr"^-1, ")")), y = "EOS (DOY)")
-  
   return(gg)
 }
 
@@ -132,8 +128,9 @@ ggplot_off_year <- function(x){
     geom_ribbon(data = df, aes(x = year, ymin = lower, ymax = upper), alpha = 0.2, fill = "black") +
     geom_line(data = df, aes(year, off), col = "black",size=.8) +
     theme_classic() +
-    scale_y_continuous(limits = c(175,365),breaks = seq(200,350,50)) + 
-    #scale_x_continuous(limits = c(min(parres7$year),max(parres7$year)), breaks = seq(1950,2020,20)) +
+    coord_cartesian(xlim = c(min(parres7$year),max(parres7$year)), ylim = c(175,365)) +
+    scale_x_continuous(breaks = seq(1950,2020,20)) + 
+    scale_y_continuous(breaks = seq(200,350,50)) + 
     labs(x = "Year", y = "EOS (DOY)")
   return(gg)
 }
@@ -151,8 +148,9 @@ ggplot_on_year <- function(x){
     geom_ribbon(data = df, aes(x = year, ymin = lower, ymax = upper), alpha = 0.2, fill = "black") +
     geom_line(data = df, aes(year, on), col = "black",size=.8) +
     theme_classic() +
-    scale_y_continuous(limits = c(50,200),breaks = seq(50,200,50)) + 
-    #scale_x_continuous(limits = c(min(parres8$year),max(parres8$year)), breaks = seq(1950,2020,20)) +
+    coord_cartesian(xlim = c(min(parres8$year),max(parres8$year)), ylim = c(50,200)) +
+    scale_x_continuous(breaks = seq(1950,2020,20)) + 
+    scale_y_continuous(breaks = seq(50,200,50)) +
     labs(x = "Year", y = "SOS (DOY)")
   return(gg)
 }
@@ -170,8 +168,9 @@ ggplot_catot_year <- function(x){
     geom_ribbon(data = df, aes(x = year, ymin = lower, ymax = upper), alpha = 0.2, fill = "black") +
     geom_line(data = df, aes(year, cA_tot), col = "black",size=.8) +
     theme_classic() +
-    scale_y_continuous(limits = c(150,2050),breaks = seq(500,2000,500)) + 
-    #scale_x_continuous(limits = c(min(parres9$year),max(parres9$year)), breaks = seq(1950,2020,20)) +
+    coord_cartesian(xlim = c(min(parres9$year),max(parres9$year)), ylim = c(300,2200)) +
+    scale_x_continuous(breaks = seq(1950,2020,20)) + 
+    scale_y_continuous(breaks = seq(0,2300,500)) +
     labs(x = "Year", y = "cA_tot")
   return(gg)
 }
@@ -189,9 +188,9 @@ ggplot_gppnet_year <- function(x){
     geom_ribbon(data = df, aes(x = year, ymin = lower, ymax = upper), alpha = 0.2, fill = "black") +
     geom_line(data = df, aes(year, gpp_net), col = "black",size=.8) +
     theme_classic() +
-    #scale_y_continuous(limits = c(1350,2350),breaks = seq(1500,2500,250)) + 
-    scale_y_continuous(limits = c(300,2200),breaks = seq(500,2000,500)) + 
-    #scale_x_continuous(limits = c(min(parres10$year),max(parres10$year)), breaks = seq(1950,2020,20)) +
+    coord_cartesian(xlim = c(min(parres10$year),max(parres10$year)), ylim = c(300,2200)) +
+    scale_x_continuous(breaks = seq(1950,2020,20)) + 
+    scale_y_continuous(breaks = seq(0,2300,500)) +
     labs(x = "Year", y = "gpp_net")
   return(gg)
 }
@@ -209,11 +208,10 @@ ggplot_iav_off_gppnet <- function(x){
     geom_ribbon(data = df, aes(x = gpp_net, ymin = lower, ymax = upper), alpha = 0.2, fill = "black") +
     geom_line(data = df, aes(gpp_net, off), col = "black",size=.8) +
     theme_classic() +
-    scale_y_continuous(limits = c(175,365),breaks = seq(200,350,50)) + 
-    scale_x_continuous(breaks = seq(1200,2400,400)) +
-    #scale_x_continuous(limits = c(min(parres11$gpp_net),max(parres11$gpp_net)), breaks = seq(1200,2400,400)) +
+    coord_cartesian(xlim = c(min(parres11$gpp_net),max(parres11$gpp_net)), ylim = c(175,365)) +
+    scale_x_continuous(breaks = seq(0,2300,500)) + 
+    scale_y_continuous(breaks = seq(200,350,50)) + 
     labs(x = expression(paste(italic("A")[net], " (gC m"^-2, " yr"^-1, ")")), y = "EOS (DOY)")
-  
   return(gg)
 }
 
@@ -230,11 +228,10 @@ ggplot_lt_off_gppnet <- function(x){
     geom_ribbon(data = df, aes(x = gpp_net, ymin = lower, ymax = upper), alpha = 0.2, fill = "black") +
     geom_line(data = df, aes(gpp_net, off), col = "black",size=.8) +
     theme_classic() +
-    scale_y_continuous(limits = c(175,365),breaks = seq(200,350,50)) + 
-    scale_x_continuous(breaks = seq(1200,2400,400)) +
-    #scale_x_continuous(limits = c(min(parres12$gpp_net),max(parres12$gpp_net)), breaks = seq(400,1500,400)) +
+    coord_cartesian(xlim = c(min(parres12$gpp_net),max(parres12$gpp_net)), ylim = c(175,365)) +
+    scale_x_continuous(breaks = seq(0,2300,500)) + 
+    scale_y_continuous(breaks = seq(200,350,50)) + 
     labs(x = expression(paste(italic("A")[net], " (gC m"^-2, " yr"^-1, ")")), y = "EOS (DOY)")
-  
   return(gg)
 }
 
@@ -251,10 +248,10 @@ ggplot_lt_off_gppnet_year <- function(x){
     geom_ribbon(data = df, aes(x = year, ymin = lower, ymax = upper), alpha = 0.2, fill = "black") +
     geom_line(data = df, aes(year, off), col = "black",size=.8) +
     theme_classic() +
-    scale_y_continuous(limits = c(175,365),breaks = seq(200,350,50)) + 
-    #scale_x_continuous(limits = c(min(parres13$year),max(parres13$year)), breaks = seq(1950,2015,20)) +
+    coord_cartesian(xlim = c(min(parres13$year),max(parres13$year)), ylim = c(175,365)) +
+    scale_x_continuous(breaks = seq(1950,2020,20)) + 
+    scale_y_continuous(breaks = seq(200,350,50)) + 
     labs(x ="Year", y = "EOS (DOY)")
-  
   return(gg)
 }
 
@@ -272,7 +269,6 @@ ggplot_iav_off_on <- function(x){
     geom_line(data = df, aes(on, off), col = "black",size=.8) +
     theme_classic() +
     scale_y_continuous(limits = c(175,365),breaks = seq(200,350,50)) + 
-    #scale_x_continuous(limits = c(min(parres14$on),max(parres14$on))) +
     labs(x = "SOS (DOY)", y = "EOS (DOY)")
   return(gg)
 }
@@ -291,7 +287,6 @@ ggplot_lt_off_on <- function(x){
     geom_line(data = df, aes(on, off), col = "black",size=.8) +
     theme_classic() +
     scale_y_continuous(limits = c(175,365),breaks = seq(200,350,50)) + 
-    #scale_x_continuous(limits = c(min(parres15$on),max(parres15$on))) +
     labs(x = "SOS (DOY)", y = "EOS (DOY)")
   return(gg)
 }
@@ -310,7 +305,6 @@ ggplot_lt_off_on_year <- function(x){
     geom_line(data = df, aes(year, off), col = "black",size=.8) +
     theme_classic() +
     scale_y_continuous(limits = c(175,365),breaks = seq(200,350,50)) + 
-    #scale_x_continuous(limits = c(min(parres16$year),max(parres16$year))) +
     labs(x = "Year", y = "EOS (DOY)")
   return(gg)
 }
@@ -328,8 +322,6 @@ ggplot_on_modis <- function(x){
     geom_ribbon(data = df, aes(x = on, ymin = lower, ymax = upper), alpha = 0.2, fill = "black") +
     geom_line(data = df, aes(on, off), col = "black",size=.8) +
     theme_classic() +
-    #scale_y_continuous(limits = c(175,365),breaks = seq(200,350,50)) + 
-    #scale_x_continuous(limits = c(min(parres17$on),max(parres17$on))) +
     labs(x = "SOS (DOY)", y = "EOS (DOY)")
   return(gg)
 }
@@ -348,7 +340,6 @@ ggplot_mean_on <- function(x){
     geom_line(data = df, aes(mean_on, off), col = "black",size=.8) +
     theme_classic() +
     scale_y_continuous(limits = c(0,365),breaks = seq(50,350,100)) + 
-    #scale_x_continuous(limits = c(min(parres18$mean_on),max(parres18$mean_on))) +
     labs(x = "Mean SOS (DOY)", y = "EOS (DOY)")
   return(gg)
 }
@@ -366,9 +357,6 @@ ggplot_anom_on <- function(x){
     geom_line(data = df, aes(anom_on, off), col = "black",size=.8) +
     theme_classic() +
     scale_y_continuous(limits = c(0,365),breaks = seq(50,350,100)) + 
-    #scale_x_continuous(limits = c(min(parres19$anom_on),max(parres19$anom_on))) +
     labs(x = "Anomalies SOS (DOY)", y = "EOS (DOY)")
-  
   return(gg)
 }
-

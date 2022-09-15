@@ -30,9 +30,7 @@ fit_iav_pep_off_vs_cAtot = lmer(off ~ scale(cA_tot) + (1|id_site) + (1|species) 
 summary(fit_iav_pep_off_vs_cAtot)
 out <- summary(fit_iav_pep_off_vs_cAtot)
 estimate <- out$coefficients[,"Estimate"]
-CI <- out$coefficient[,"Std. Error"]*1.96
-upperCI <- out$coefficients["scale(cA_tot)","Estimate"] + out$coefficient["scale(cA_tot)","Std. Error"]*1.96
-lowerCI <- out$coefficients["scale(cA_tot)","Estimate"] - out$coefficient["scale(cA_tot)","Std. Error"]*1.96
+out$coefficients
 r.squaredGLMM(fit_iav_pep_off_vs_cAtot)
 plot(allEffects(fit_iav_pep_off_vs_cAtot))
 aic <- AIC(fit_iav_pep_off_vs_cAtot)
@@ -53,12 +51,7 @@ lowerCI_unscaled <- out$coefficients["scale(cA_tot)","Estimate"]/ sd(df_pep$cA_t
 fit_lt_pep_off_vs_cAtot_year = lmer(off ~ scale(cA_tot) + scale(year) + (1|id_site) + (1|species), data = df_pep, na.action = "na.exclude")
 summary(fit_lt_pep_off_vs_cAtot_year)
 out <- summary(fit_lt_pep_off_vs_cAtot_year)
-out$coefficients[,"Estimate"]
-out$coefficient[,"Std. Error"]*1.96
-upperCI1 <- out$coefficients["scale(cA_tot)","Estimate"] + out$coefficient["scale(cA_tot)","Std. Error"]*1.96
-lowerCI1 <- out$coefficients["scale(cA_tot)","Estimate"] - out$coefficient["scale(cA_tot)","Std. Error"]*1.96
-upperCI2 <- out$coefficients["scale(year)","Estimate"] + out$coefficient["scale(year)","Std. Error"]*1.96
-lowerCI2 <- out$coefficients["scale(year)","Estimate"] - out$coefficient["scale(year)","Std. Error"]*1.96
+out$coefficients
 r.squaredGLMM(fit_lt_pep_off_vs_cAtot_year)
 plot(allEffects(fit_lt_pep_off_vs_cAtot_year))
 tab_model(fit_lt_pep_off_vs_cAtot_year)
@@ -90,22 +83,22 @@ out_anova
 ff_lt_pep_off_vs_year <- gg_lt_pep_off_vs_year +
   labs(title = expression(paste("EOS ~ ", bold("Year"), " + ", italic("A")[net])), 
        subtitle = "PEP data and LPJ") +
-  theme(legend.position = "none") 
+  theme(legend.position = "none",plot.subtitle=element_text(size=10))  
 
 ff_lt_pep_off_vs_cAtot <- gg_lt_pep_off_vs_cAtot +
   labs(title = expression(paste("EOS ~ Year + ", bolditalic("A")[bold(net)])), 
-       subtitle = "PEP data and LPJ") +
-  theme(legend.position = "none") 
+       subtitle = "") +
+  theme(legend.position = "none",plot.subtitle=element_text(size=10))  
 
 ff_iav_pep_off_vs_cAtot <- gg_iav_pep_off_vs_cAtot +
   labs(title = expression(paste("EOS ~ ", italic("A")[net])), 
-       subtitle = "PEP data and LPJ") +
+       subtitle = "") +
   theme(#plot.background = element_rect(colour = "darkgrey", fill=NA, size=2),
         legend.key = element_rect(fill = NA, color = NA),
         legend.position = c(.85, .95),
         legend.direction="vertical",
         legend.margin = margin(.2, .2, .2, .2),
-        legend.key.size = unit(.6, 'lines')) 
+        legend.key.size = unit(.6, 'lines'),plot.subtitle=element_text(size=10))  
 
 pp1 <- ff_lt_pep_off_vs_year + ff_lt_pep_off_vs_cAtot + ff_iav_pep_off_vs_cAtot +
  plot_annotation(tag_levels = 'A') #+ plot_layout(guides = "collect") & theme(legend.position = 'left')

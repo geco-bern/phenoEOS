@@ -4,6 +4,7 @@
 # load packages
 library(dplyr)
 library(tidyverse)
+library(tidyr)
 library(lme4) 
 library(MuMIn) 
 library(lmerTest) 
@@ -42,8 +43,7 @@ length(unique(df_modis$sitename)) #4879
 fit_iav_modis_off_vs_gppnet = lmer(off ~ scale(gpp_net) + (1|sitename) , data = df_modis, na.action = "na.exclude")
 summary(fit_iav_modis_off_vs_gppnet)
 out <- summary(fit_iav_modis_off_vs_gppnet)
-out$coefficients[,"Estimate"]
-out$coefficients[,"Std. Error"]
+out$coefficients
 r.squaredGLMM(fit_iav_modis_off_vs_gppnet)
 plot(allEffects(fit_iav_modis_off_vs_gppnet))
 parres4 <- partialize(fit_iav_modis_off_vs_gppnet,"gpp_net") # calculate partial residuals
@@ -72,8 +72,7 @@ df_modis <- df_modis %>%
 fit_modis_anom_gppnet = lmer(off ~ scale(mean_gpp_net) + scale(anom_gpp_net) + (1|sitename) + (1|year), data = df_modis, na.action = "na.exclude")
 summary(fit_modis_anom_gppnet)
 out <- summary(fit_modis_anom_gppnet)
-out$coefficients[,"Estimate"]
-out$coefficient[,"Std. Error"]*1.96
+out$coefficients
 r.squaredGLMM(fit_modis_anom_gppnet)
 plot(allEffects(fit_modis_anom_gppnet))
 parres5 <- partialize(fit_modis_anom_gppnet,"mean_gpp_net") # calculate partial residuals
@@ -93,16 +92,16 @@ error_unscaled <- out$coefficients["scale(anom_gpp_net)","Std. Error"]/ sd(df_mo
 ff_modis_mean_gppnet <- gg_modis_mean_gppnet +
   labs(title = expression(paste("EOS ~ ", bold("Mean "), bolditalic("A")[bold(net)], 
                                 " + Anomalies ", italic("A")[net])), subtitle = "MODIS data and P-model") +
-  theme(legend.position = "none") 
+  theme(legend.position = "none",plot.subtitle=element_text(size=10))  
 
 ff_modis_anom_gppnet <- gg_modis_anom_gppnet +
   labs(title = expression(paste("EOS ~ Mean ", italic("A")[net], " + " ,
-                                bold("Anomalies "), bolditalic("A")[bold(net)])), subtitle = "MODIS data and P-model") +
+                                bold("Anomalies "), bolditalic("A")[bold(net)])), subtitle = "") +
   theme(legend.key = element_rect(fill = NA, color = NA),
-        legend.position = c(.85, .25),
+        legend.position = c(.15, .25),
         legend.direction="vertical",
         legend.margin = margin(.2, .2, .2, .2),
-        legend.key.size = unit(.6, 'lines')) 
+        legend.key.size = unit(.6, 'lines'),plot.subtitle=element_text(size=10))  
 
 # Maps
 lon_breaks <- seq(from = floor(min(df_modis$lon)), to = ceiling(max(df_modis$lon)), by = 0.1)
@@ -144,7 +143,6 @@ map_gpp <- ggplot(data = world) +
   coord_sf(xlim = c(-180, 180), ylim = c(15, 75), expand = F) +
   geom_point(data = df_modis_agg, aes(x = lon, y = lat, color = mean_gpp),size=.3) +
   labs(color=expression(paste(italic("A")[net], " (gC m"^-2, " yr"^-1, ")"))) +
-  #scale_color_viridis(option="magma",limits=c(900,3500), breaks= seq(1000,3500,500)) +
   scale_color_viridis(option="magma",limits=c(650,2550), breaks= seq(1000,2500,500)) +
   theme(legend.position="right", panel.background = element_rect(fill = "aliceblue"),axis.title=element_blank(),plot.title = element_text(size = 10))
 
@@ -152,3 +150,198 @@ pp2 <- (ff_modis_mean_gppnet + ff_modis_anom_gppnet)/ map_eos / map_gpp +
  plot_annotation(tag_levels = 'A') + plot_layout(heights = c(1.5, 1, 1),widths = c(2, 1, 1))
 pp2
 ggsave("~/phenoEOS/manuscript/figures/fig_2_rev.png", width = 9, height = 8, dpi=300)
+
+# Sensitivity analysis ####
+
+# daylength threshold of 10.0 hours
+
+# read phenology dates from MODIS
+modis_pheno_sites <- readRDS("~/phenoEOS/data/modis_pheno_sites.rds")
+
+# read p-model outputs
+modis_pmodel <- readRDS("~/phenoEOS/data/sensitivity/modis_pmodel_Anet_10h.rds") 
+
+modis_pmodel <- modis_pmodel %>% 
+  mutate(gpp_net = Anet_pmodel - rd_pmodel) %>%
+  mutate(gpp_net=ifelse(gpp_net==0, NA, gpp_net))
+
+# join datasets
+df_modis <- modis_pheno_sites %>% 
+  left_join(modis_pmodel)
+
+# Select the pheno band
+df_modis <- df_modis %>% rename(on = SOS_2_doy, off = EOS_2_doy) %>% filter(off>on)
+length(unique(df_modis$sitename)) #4879
+
+# Long-term separating mean across years 2001-2018 from interannual anomaly.
+# EOS ~ Mean Anet + Anomalies Anet
+separate_anom <- function(df){
+  df_mean <- df %>% 
+    summarise(mean_off = mean(off, na.rm = TRUE), 
+              mean_gpp_net = mean(gpp_net, na.rm = TRUE))
+  df %>% 
+    mutate(mean_gpp_net = df_mean$mean_gpp_net,
+           anom_gpp_net = gpp_net - df_mean$mean_gpp_net)
+}
+
+df_modis <- df_modis %>% 
+  group_by(sitename) %>% 
+  nest() %>% 
+  mutate(data = purrr::map(data, ~separate_anom(.))) %>% 
+  unnest(data)
+
+fit_modis_anom_gppnet = lmer(off ~ scale(mean_gpp_net) + scale(anom_gpp_net) + (1|sitename) + (1|year), data = df_modis, na.action = "na.exclude")
+summary(fit_modis_anom_gppnet)
+out <- summary(fit_modis_anom_gppnet)
+out$coefficients
+parres5 <- partialize(fit_modis_anom_gppnet,"mean_gpp_net") # calculate partial residuals
+parres6 <- partialize(fit_modis_anom_gppnet,"anom_gpp_net") # calculate partial residuals
+out_modis_anom_gppnet <- allEffects(fit_modis_anom_gppnet)
+gg_modis_mean_gppnet_10h <- ggplot_mean_gppnet(out_modis_anom_gppnet)
+gg_modis_anom_gppnet_10h <- ggplot_anom_gppnet(out_modis_anom_gppnet)
+
+# doy threshold of 23 Sep
+# doy_cutoff <- lubridate::yday("2001-09-23")
+
+# read phenology dates from MODIS
+modis_pheno_sites <- readRDS("~/phenoEOS/data/modis_pheno_sites.rds")
+
+# read p-model outputs
+modis_pmodel <- readRDS("~/phenoEOS/data/sensitivity/modis_pmodel_Anet_23S.rds") 
+
+modis_pmodel <- modis_pmodel %>% 
+  mutate(gpp_net = Anet_pmodel - rd_pmodel) %>%
+  mutate(gpp_net=ifelse(gpp_net==0, NA, gpp_net))
+
+# join datasets
+df_modis <- modis_pheno_sites %>% 
+  left_join(modis_pmodel)
+
+# Select the pheno band
+df_modis <- df_modis %>% rename(on = SOS_2_doy, off = EOS_2_doy) %>% filter(off>on)
+length(unique(df_modis$sitename)) #4879
+
+# Long-term separating mean across years 2001-2018 from interannual anomaly.
+# EOS ~ Mean Anet + Anomalies Anet
+separate_anom <- function(df){
+  df_mean <- df %>% 
+    summarise(mean_off = mean(off, na.rm = TRUE), 
+              mean_gpp_net = mean(gpp_net, na.rm = TRUE))
+  df %>% 
+    mutate(mean_gpp_net = df_mean$mean_gpp_net,
+           anom_gpp_net = gpp_net - df_mean$mean_gpp_net)
+}
+
+df_modis <- df_modis %>% 
+  group_by(sitename) %>% 
+  nest() %>% 
+  mutate(data = purrr::map(data, ~separate_anom(.))) %>% 
+  unnest(data)
+
+fit_modis_anom_gppnet = lmer(off ~ scale(mean_gpp_net) + scale(anom_gpp_net) + (1|sitename) + (1|year), data = df_modis, na.action = "na.exclude")
+summary(fit_modis_anom_gppnet)
+out <- summary(fit_modis_anom_gppnet)
+out$coefficients
+parres5 <- partialize(fit_modis_anom_gppnet,"mean_gpp_net") # calculate partial residuals
+parres6 <- partialize(fit_modis_anom_gppnet,"anom_gpp_net") # calculate partial residuals
+out_modis_anom_gppnet <- allEffects(fit_modis_anom_gppnet)
+gg_modis_mean_gppnet_23S <- ggplot_mean_gppnet(out_modis_anom_gppnet)
+gg_modis_anom_gppnet_23S <- ggplot_anom_gppnet(out_modis_anom_gppnet)
+
+# doy threshold of 21 Jun
+# doy_cutoff <- lubridate::yday("2001-06-21")
+
+# read phenology dates from MODIS
+modis_pheno_sites <- readRDS("~/phenoEOS/data/modis_pheno_sites.rds")
+
+# read p-model outputs
+modis_pmodel <- readRDS("~/phenoEOS/data/sensitivity/modis_pmodel_Anet_21J.rds") 
+
+modis_pmodel <- modis_pmodel %>% 
+  mutate(gpp_net = Anet_pmodel - rd_pmodel) %>%
+  mutate(gpp_net=ifelse(gpp_net==0, NA, gpp_net))
+
+# join datasets
+df_modis <- modis_pheno_sites %>% 
+  left_join(modis_pmodel)
+
+# Select the pheno band
+df_modis <- df_modis %>% rename(on = SOS_2_doy, off = EOS_2_doy) %>% filter(off>on)
+length(unique(df_modis$sitename)) #4879
+
+# Long-term separating mean across years 2001-2018 from interannual anomaly.
+# EOS ~ Mean Anet + Anomalies Anet
+separate_anom <- function(df){
+  df_mean <- df %>% 
+    summarise(mean_off = mean(off, na.rm = TRUE), 
+              mean_gpp_net = mean(gpp_net, na.rm = TRUE))
+  df %>% 
+    mutate(mean_gpp_net = df_mean$mean_gpp_net,
+           anom_gpp_net = gpp_net - df_mean$mean_gpp_net)
+}
+
+df_modis <- df_modis %>% 
+  group_by(sitename) %>% 
+  nest() %>% 
+  mutate(data = purrr::map(data, ~separate_anom(.))) %>% 
+  unnest(data)
+
+fit_modis_anom_gppnet = lmer(off ~ scale(mean_gpp_net) + scale(anom_gpp_net) + (1|sitename) + (1|year), data = df_modis, na.action = "na.exclude")
+summary(fit_modis_anom_gppnet)
+out <- summary(fit_modis_anom_gppnet)
+out$coefficients
+parres5 <- partialize(fit_modis_anom_gppnet,"mean_gpp_net") # calculate partial residuals
+parres6 <- partialize(fit_modis_anom_gppnet,"anom_gpp_net") # calculate partial residuals
+out_modis_anom_gppnet <- allEffects(fit_modis_anom_gppnet)
+gg_modis_mean_gppnet_21J <- ggplot_mean_gppnet(out_modis_anom_gppnet)
+gg_modis_anom_gppnet_21J <- ggplot_anom_gppnet(out_modis_anom_gppnet)
+
+# Supplementary Fig. S4
+ff_modis_mean_gppnet_10h <- gg_modis_mean_gppnet_10h +
+  labs(title = expression(paste("EOS ~ ", bold("Mean "), bolditalic("A")[bold(net)], 
+                                " + Anomalies ", italic("A")[net])), 
+       subtitle = "MODIS data and P-model \nDaylength threshold of 10 h.") +
+  theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
+
+ff_modis_anom_gppnet_10h <- gg_modis_anom_gppnet_10h +
+  labs(title = expression(paste("EOS ~ Mean ", italic("A")[net], " + " ,
+                                bold("Anomalies "), bolditalic("A")[bold(net)])), 
+       subtitle = "") +
+  theme(legend.key = element_rect(fill = NA, color = NA),
+        legend.position = c(.15, .25),
+        legend.direction="vertical",
+        legend.margin = margin(.2, .2, .2, .2),
+        legend.key.size = unit(.6, 'lines'),plot.subtitle=element_text(size=10)) 
+
+ff_modis_mean_gppnet_21J <- gg_modis_mean_gppnet_21J +
+  labs(title = expression(paste("EOS ~ ", bold("Mean "), bolditalic("A")[bold(net)], 
+                                " + Anomalies ", italic("A")[net])), 
+       subtitle = "MODIS data and P-model \nDOY threshold in June 21") +
+  theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
+
+ff_modis_anom_gppnet_21J <- gg_modis_anom_gppnet_21J +
+  labs(title = expression(paste("EOS ~ Mean ", italic("A")[net], " + " ,
+                                bold("Anomalies "), bolditalic("A")[bold(net)])), 
+       subtitle = "") +
+  theme(legend.position = "none",plot.subtitle=element_text(size=10))  
+
+ff_modis_mean_gppnet_23S <- gg_modis_mean_gppnet_23S +
+  labs(title = expression(paste("EOS ~ ", bold("Mean "), bolditalic("A")[bold(net)], 
+                                " + Anomalies ", italic("A")[net])), 
+       subtitle = "MODIS data and P-model \nDOY threshold in Sept 23") +
+  theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
+
+ff_modis_anom_gppnet_23S <- gg_modis_anom_gppnet_23S +
+  labs(title = expression(paste("EOS ~ Mean ", italic("A")[net], " + " ,
+                                bold("Anomalies "), bolditalic("A")[bold(net)])), 
+       subtitle = "") +
+  theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
+
+ss4 <- ff_modis_mean_gppnet_10h + ff_modis_anom_gppnet_10h +
+  ff_modis_mean_gppnet_23S + ff_modis_anom_gppnet_23S +
+  ff_modis_mean_gppnet_21J + ff_modis_anom_gppnet_21J +
+  plot_annotation(tag_levels = 'A') + 
+  plot_layout(ncol = 2)
+ss4 
+ggsave("~/phenoEOS/manuscript/figures/fig_S4_rev.png", width = 7.5, height = 10.5, dpi=300)
+
