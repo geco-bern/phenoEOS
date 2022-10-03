@@ -300,7 +300,7 @@ ff_modis_mean_gppnet_10h <- gg_modis_mean_gppnet_10h +
   labs(title = expression(paste("EOS ~ ", bold("Mean "), bolditalic("A")[bold(net)], 
                                 " + Anomalies ", italic("A")[net])), 
        subtitle = "MODIS data and P-model \nDaylength threshold of 10 h.") +
-  theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
+  theme(legend.position = "none",plot.title=element_text(size=11.5),plot.subtitle=element_text(size=10))   
 
 ff_modis_anom_gppnet_10h <- gg_modis_anom_gppnet_10h +
   labs(title = expression(paste("EOS ~ Mean ", italic("A")[net], " + " ,
@@ -310,31 +310,31 @@ ff_modis_anom_gppnet_10h <- gg_modis_anom_gppnet_10h +
         legend.position = c(.15, .25),
         legend.direction="vertical",
         legend.margin = margin(.2, .2, .2, .2),
-        legend.key.size = unit(.6, 'lines'),plot.subtitle=element_text(size=10)) 
+        legend.key.size = unit(.6, 'lines'),plot.title=element_text(size=11.5),plot.subtitle=element_text(size=10))   
 
 ff_modis_mean_gppnet_23S <- gg_modis_mean_gppnet_23S +
   labs(title = expression(paste("EOS ~ ", bold("Mean "), bolditalic("A")[bold(net)], 
                                 " + Anomalies ", italic("A")[net])), 
        subtitle = "MODIS data and P-model \nDOY threshold in Sept 23") +
-  theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
+  theme(legend.position = "none",plot.title=element_text(size=11.5),plot.subtitle=element_text(size=10))   
 
 ff_modis_anom_gppnet_23S <- gg_modis_anom_gppnet_23S +
   labs(title = expression(paste("EOS ~ Mean ", italic("A")[net], " + " ,
                                 bold("Anomalies "), bolditalic("A")[bold(net)])), 
        subtitle = "") +
-  theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
+  theme(legend.position = "none",plot.title=element_text(size=11.5),plot.subtitle=element_text(size=10))  
 
 ff_modis_mean_gppnet_21J <- gg_modis_mean_gppnet_21J +
   labs(title = expression(paste("EOS ~ ", bold("Mean "), bolditalic("A")[bold(net)], 
                                 " + Anomalies ", italic("A")[net])), 
        subtitle = "MODIS data and P-model \nDOY threshold in June 21") +
-  theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
+  theme(legend.position = "none",plot.title=element_text(size=11.5),plot.subtitle=element_text(size=10))   
 
 ff_modis_anom_gppnet_21J <- gg_modis_anom_gppnet_21J +
   labs(title = expression(paste("EOS ~ Mean ", italic("A")[net], " + " ,
                                 bold("Anomalies "), bolditalic("A")[bold(net)])), 
        subtitle = "") +
-  theme(legend.position = "none",plot.subtitle=element_text(size=10))  
+  theme(legend.position = "none",plot.title=element_text(size=11.5),plot.subtitle=element_text(size=10))  
 
 figS4 <- ff_modis_mean_gppnet_10h + ff_modis_anom_gppnet_10h +
   ff_modis_mean_gppnet_23S + ff_modis_anom_gppnet_23S +
@@ -342,5 +342,5 @@ figS4 <- ff_modis_mean_gppnet_10h + ff_modis_anom_gppnet_10h +
   plot_annotation(tag_levels = 'A') + 
   plot_layout(ncol = 2)
 figS4 
-ggsave("~/phenoEOS/manuscript/figures/fig_S4_rev.png", width = 7.5, height = 10.5, dpi=300)
+ggsave("~/phenoEOS/manuscript/figures/fig_S4_rev.png", width = 7, height = 11, dpi=300)
 
