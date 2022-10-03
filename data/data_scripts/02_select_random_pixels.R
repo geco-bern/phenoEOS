@@ -1,5 +1,4 @@
-# select random pixels
-# from all pixel locations
+# select random pixels from all pixel locations
 
 # load libraries
 library(dplyr)

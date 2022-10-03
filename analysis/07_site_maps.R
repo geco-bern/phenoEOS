@@ -105,6 +105,6 @@ map_modis_sites <- ggplot(data = world) +
   theme(legend.position="right", panel.background = element_rect(fill = "aliceblue"),
         axis.title=element_blank(),plot.title = element_text(size = 10))
 
-ffs <- map_pep_sites / map_modis_sites
-ffs + plot_annotation(tag_levels = 'A') + plot_layout(heights = c(1, 1),widths = c(1,0.7))
-ggsave("~/phenoEOS/manuscript/figures/fig_S5_rev.png", width = 9, height = 8, dpi=300)
+figS9 <- map_pep_sites / map_modis_sites
+figS9 + plot_annotation(tag_levels = 'A') + plot_layout(heights = c(1, 1),widths = c(1,0.7))
+ggsave("~/phenoEOS/manuscript/figures/fig_S9_rev.png", width = 9, height = 8, dpi=300)

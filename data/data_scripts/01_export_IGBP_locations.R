@@ -1,4 +1,5 @@
 # Random pixel selection
+
 library(raster)
 
 # read koeppen-geiger data

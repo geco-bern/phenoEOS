@@ -25,6 +25,8 @@ df_modis <- modis_pheno_sites %>% rename(on = SOS_2_doy, off = EOS_2_doy) %>% fi
 # EOS ~ SOS
 fit_iav_modis_off_vs_on = lmer(off ~ scale(on) + (1|sitename), data = df_modis, na.action = "na.exclude")
 summary(fit_iav_modis_off_vs_on)
+out <- summary(fit_iav_modis_off_vs_on)
+out$coefficients
 r.squaredGLMM(fit_iav_modis_off_vs_on)
 plot(allEffects(fit_iav_modis_off_vs_on))
 parres17 <- partialize(fit_iav_modis_off_vs_on,"on") # calculate partial residuals
@@ -51,6 +53,8 @@ df_modis <- df_modis %>%
 
 fit_lt_modis_anom_on = lmer(off ~ scale(mean_on) + scale(anom_on) + (1|sitename) + (1|year), data = df_modis, na.action = "na.exclude")
 summary(fit_lt_modis_anom_on)
+out <- summary(fit_lt_modis_anom_on)
+out$coefficients
 r.squaredGLMM(fit_lt_modis_anom_on)
 plot(allEffects(fit_lt_modis_anom_on))
 parres18 <- partialize(fit_lt_modis_anom_on,"mean_on") # calculate partial residuals
@@ -60,19 +64,19 @@ gg_lt_modis_mean_on <- ggplot_mean_on(out_lt_modis_anom_on)
 gg_lt_modis_anom_on <- ggplot_anom_on(out_lt_modis_anom_on)
 gg_lt_modis_mean_on + gg_lt_modis_anom_on
 
-## Supplementary Fig. S4
+## Supplementary Fig. S8
 ff_lt_modis_mean_on <- gg_lt_modis_mean_on +
   labs(title = expression(paste("EOS ~ ", bold("Mean SOS"), " + Anomalies SOS")), subtitle = "MODIS data") +
-  theme(legend.position = "none")
+  theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
 
 ff_lt_modis_anom_on <- gg_lt_modis_anom_on +
-  labs(title = expression(paste("EOS ~ Mean SOS + ", bold("Anomalies SOS"))), subtitle = "MODIS data") +
+  labs(title = expression(paste("EOS ~ Mean SOS + ", bold("Anomalies SOS"))), subtitle = "") +
   theme(legend.key = element_rect(fill = NA, color = NA),
         legend.position = c(.85, .25),
         legend.direction="vertical",
         legend.margin = margin(.2, .2, .2, .2),
-        legend.key.size = unit(.6, 'lines')) 
+        legend.key.size = unit(.6, 'lines'),plot.subtitle=element_text(size=10))  
 
-ss4 <- ff_lt_modis_mean_on + ff_lt_modis_anom_on + plot_annotation(tag_levels = 'A')
-ss4 
-ggsave("~/phenoEOS/manuscript/figures/fig_S4_rev.png", width = 7.5, height = 4, dpi=300)
+figS8 <- ff_lt_modis_mean_on + ff_lt_modis_anom_on + plot_annotation(tag_levels = 'A')
+figS8 
+ggsave("~/phenoEOS/manuscript/figures/fig_S8_rev.png", width = 7.5, height = 4, dpi=300)

@@ -1,5 +1,5 @@
 # This script analyses the relationship of CO2 assimilation (simulated using the LPJ-GUESS model)
-# and phenological dates from local observations (PEP725 data). Outputs include Figure 1.
+# and phenological dates from local observations (PEP725 data). Outputs include Figure S2.
 
 # load packages
 library(dplyr)
@@ -79,7 +79,7 @@ lowerCI_unscaled <- out$coefficients["scale(cA_tot)","Estimate"]/ sd(df_pep$cA_t
 out_anova <- anova(fit_iav_pep_off_vs_cAtot, fit_lt_pep_off_vs_cAtot_year)
 out_anova
 
-# Figure 1
+# Supplementary Fig. S2
 ff_lt_pep_off_vs_year <- gg_lt_pep_off_vs_year +
   labs(title = expression(paste("EOS ~ ", bold("Year"), " + ", italic("A")[net])), 
        subtitle = "PEP data and LPJ") +
@@ -100,7 +100,7 @@ ff_iav_pep_off_vs_cAtot <- gg_iav_pep_off_vs_cAtot +
         legend.margin = margin(.2, .2, .2, .2),
         legend.key.size = unit(.6, 'lines'),plot.subtitle=element_text(size=10))  
 
-pp1 <- ff_lt_pep_off_vs_year + ff_lt_pep_off_vs_cAtot + ff_iav_pep_off_vs_cAtot +
+figS2 <- ff_lt_pep_off_vs_year + ff_lt_pep_off_vs_cAtot + ff_iav_pep_off_vs_cAtot +
  plot_annotation(tag_levels = 'A') #+ plot_layout(guides = "collect") & theme(legend.position = 'left')
-pp1
-ggsave("~/phenoEOS/manuscript/figures/fig_1_rev.png", width = 9, height = 3.5, dpi=300)
+figS2
+ggsave("~/phenoEOS/manuscript/figures/fig_S2_rev.png", width = 9, height = 3.5, dpi=300)

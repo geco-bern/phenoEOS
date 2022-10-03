@@ -1,5 +1,5 @@
 # This script analyses the relationship of spring and autumn phenological dates 
-# from local observations (PEP725 data). Outputs include Figure S3.
+# from local observations (PEP725 data). Outputs include Figure S7.
 
 # load packages
 library(dplyr)
@@ -26,6 +26,8 @@ df_pep <- data.table::fread("~/phenoEOS/data/DataMeta_3_Drivers_20_11_10.csv") %
 # EOS ~ SOS
 fit_iav_pep_off_vs_on = lmer(off ~ scale(on) + (1|id_site) + (1|species) , data = df_pep, na.action = "na.exclude")
 summary(fit_iav_pep_off_vs_on)
+out <- summary(fit_iav_pep_off_vs_on)
+out$coefficients
 r.squaredGLMM(fit_iav_pep_off_vs_on)
 plot(allEffects(fit_iav_pep_off_vs_on))
 parres14 <- partialize(fit_iav_pep_off_vs_on,"on")
@@ -37,6 +39,8 @@ gg_iav_pep_off_vs_on
 # EOS ~ SOS + Year
 fit_lt_pep_off_vs_on_year = lmer(off ~ scale(on) + scale(year) + (1|id_site) + (1|species), data = df_pep, na.action = "na.exclude")
 summary(fit_lt_pep_off_vs_on_year)
+out <- summary(fit_lt_pep_off_vs_on_year)
+out$coefficients
 r.squaredGLMM(fit_lt_pep_off_vs_on_year)
 plot(allEffects(fit_lt_pep_off_vs_on_year))
 parres15 <- partialize(fit_lt_pep_off_vs_on_year,"on")
@@ -45,12 +49,15 @@ out_lt_pep_off_vs_on_year <- allEffects(fit_lt_pep_off_vs_on_year)
 gg_lt_pep_off_vs_on   <- ggplot_lt_off_on(out_lt_pep_off_vs_on_year)
 gg_lt_pep_off_vs_on_year <- ggplot_lt_off_on_year(out_lt_pep_off_vs_on_year)
 gg_lt_pep_off_vs_on + gg_lt_pep_off_vs_on_year
+# Unscaled
+trend_unscaled <- out$coefficients["scale(year)","Estimate"]/ sd(df_pep$year)
+error_unscaled <- out$coefficients["scale(year)","Std. Error"]/ sd(df_pep$year)
 
 # Model comparison interannual vs. long-term
 out_anova <- anova(fit_iav_pep_off_vs_on, fit_lt_pep_off_vs_on_year, test="F")  #test="Chisq"
 out_anova
 
-## Supplementary Fig. S3
+## Supplementary Fig. S7
 ff_lt_pep_off_vs_on_year <- gg_lt_pep_off_vs_on_year +
   labs(title = expression(paste("EOS ~ ", bold("Year"), " + SOS")), subtitle = "PEP data") +
   theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
@@ -68,6 +75,6 @@ ff_iav_pep_off_vs_on <- gg_iav_pep_off_vs_on +
         legend.margin = margin(.2, .2, .2, .2),
         legend.key.size = unit(.6, 'lines'),plot.subtitle=element_text(size=10))  
 
-ss3 <- ff_lt_pep_off_vs_on_year + ff_lt_pep_off_vs_on + ff_iav_pep_off_vs_on + plot_annotation(tag_levels = 'A')
-ss3 
-ggsave("~/phenoEOS/manuscript/figures/fig_S3_rev.png", width = 9, height = 3.5, dpi=300)
+figS7 <- ff_lt_pep_off_vs_on_year + ff_lt_pep_off_vs_on + ff_iav_pep_off_vs_on + plot_annotation(tag_levels = 'A')
+figS7 
+ggsave("~/phenoEOS/manuscript/figures/fig_S7_rev.png", width = 9, height = 3.5, dpi=300)

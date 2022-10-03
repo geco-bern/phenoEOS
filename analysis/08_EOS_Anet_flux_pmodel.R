@@ -52,17 +52,19 @@ gg_flux_mean_gpp <- plot_model(fit_flux_anom_gpp, type = "pred", terms = c("mean
        x = expression(paste("Mean GPP" , " (gC m"^-2, " yr"^-1, ")")), y = "EOS (DOY)") +
   annotate("text", x = 450, y = 310, label = "italic(P) == 0.095",parse = TRUE,size=3) +
   scale_y_continuous(limits = c(200,310),breaks = seq(220,310,40)) + 
-  scale_x_continuous(limits = c(320,1850),breaks = seq(400,1800,400)) 
+  scale_x_continuous(limits = c(320,1850),breaks = seq(400,1800,400)) +
+  theme(plot.title=element_text(size=12),plot.subtitle=element_text(size=10)) 
 gg_flux_mean_gpp
 
 gg_flux_anom_gpp <- plot_model(fit_flux_anom_gpp, type = "pred", terms = c("anom_gpp_net")) +
   theme_classic() +
   labs(title = expression(paste("EOS ~ Mean GPP", " + " ,
-                                bold("Anomalies GPP"))), subtitle = "FLUXNET observations",
+                                bold("Anomalies GPP"))), subtitle = "",
        x = expression(paste("Anomalies GPP" , " (gC m"^-2, " yr"^-1, ")")), y = "EOS (DOY)") +
   annotate("text", x = -850, y = 285, label = "italic(P) == 0.646",parse = TRUE,size=3) +
   scale_y_continuous(limits = c(246,285),breaks = seq(250,280,10)) + 
-  scale_x_continuous(limits = c(-1050,1200),breaks = seq(-1000,1200,500)) 
+  scale_x_continuous(limits = c(-1050,1200),breaks = seq(-1000,1200,500)) +
+  theme(plot.title=element_text(size=12),plot.subtitle=element_text(size=10)) 
 gg_flux_anom_gpp
 
 # GPP from P-model simulations ####
@@ -104,25 +106,28 @@ gg_pmodel_mean_gpp <- plot_model(fit_pmodel_anom_gpp, type = "pred", terms = c("
        x = expression(paste("Mean GPP" , " (gC m"^-2, " yr"^-1, ")")), y = "EOS (DOY)") +
   annotate("text", x = 830, y = 310, label = "italic(P) == 0.115",parse = TRUE,size=3) +
   scale_y_continuous(limits = c(200,310),breaks = seq(220,310,40)) + 
-  scale_x_continuous(limits = c(750,1650),breaks = seq(750,1620,250)) 
+  scale_x_continuous(limits = c(750,1650),breaks = seq(750,1620,250)) +
+  theme(plot.title=element_text(size=12),plot.subtitle=element_text(size=10)) 
 gg_pmodel_mean_gpp
 
 gg_pmodel_anom_gpp <- plot_model(fit_pmodel_anom_gpp, type = "pred", terms = c("anom_gpp_net")) +
   theme_classic() +
   labs(title = expression(paste("EOS ~ Mean GPP", " + " ,
-                                bold("Anomalies GPP"))), subtitle = "P-model simulations",
+                                bold("Anomalies GPP"))), subtitle = "",
        x = expression(paste("Anomalies GPP" , " (gC m"^-2, " yr"^-1, ")")), y = "EOS (DOY)") +
   annotate("text", x = -420, y = 285, label = paste0("italic(P) == ", deparse("0.860")),parse = TRUE,size=3) +
   scale_y_continuous(limits = c(246,285),breaks = seq(250,280,10)) + 
-  scale_x_continuous(limits = c(-500,400),breaks = seq(-500,500,250)) 
+  scale_x_continuous(limits = c(-500,400),breaks = seq(-500,500,250)) +
+  theme(plot.title=element_text(size=12),plot.subtitle=element_text(size=10)) 
 gg_pmodel_anom_gpp
 
+## Supplementary Fig. S5
 # join plots from Fluxnet observations and P-model simulations analyses
-ppS6 <- gg_flux_mean_gpp + gg_flux_anom_gpp + gg_pmodel_mean_gpp + gg_pmodel_anom_gpp + 
+figS5 <- gg_flux_mean_gpp + gg_flux_anom_gpp + gg_pmodel_mean_gpp + gg_pmodel_anom_gpp + 
   plot_layout(ncol = 2) +
   plot_annotation(tag_levels = 'A') #+ plot_layout(guides = "collect") & theme(legend.position = 'left')
-ppS6
-ggsave("~/phenoEOS/manuscript/figures/fig_S6_rev.png", width = 7.5, height = 7.5, dpi=300)
+figS5
+ggsave("~/phenoEOS/manuscript/figures/fig_S5_rev.png", width = 7.5, height = 7.5, dpi=300)
 
 # GPP net from P-model simulations ####
 fluxnet_pmodel_pheno <- readRDS("~/phenoEOS/data/fluxnet_pmodel_pheno.rds")
@@ -165,22 +170,22 @@ gg_pmodel_mean_gppnet <- plot_model(fit_pmodel_anom_gppnet, type = "pred", terms
   annotate("text", x = 800, y = 320, label = "italic(P) == 0.095",parse = TRUE,size=3) +
   scale_y_continuous(limits = c(200,320),breaks = seq(220,310,40)) + 
   scale_x_continuous(limits = c(700,1550),breaks = seq(750,1620,250)) +
-  theme(plot.title = element_text(size=11),plot.subtitle = element_text(size=10))
+  theme(plot.title=element_text(size=11),plot.subtitle=element_text(size=10)) 
 gg_pmodel_mean_gppnet
 
 gg_pmodel_anom_gppnet <- plot_model(fit_pmodel_anom_gppnet, type = "pred", terms = c("anom_gpp_net")) +
   theme_classic() +
   labs(title = expression(paste("EOS ~ Mean ", "GPP"[net], " + " ,
-                                bold("Anomalies "), bold("GPP")[bold(net)])), subtitle = "P-model simulations",
+                                bold("Anomalies "), bold("GPP")[bold(net)])), subtitle = "",
        x = expression(paste("Anomalies " ,"GPP"[net], " (gC m"^-2, " yr"^-1, ")")), y = "EOS (DOY)") +
   annotate("text", x = -400, y = 285, label = paste0("italic(P) == ", deparse("0.867")),parse = TRUE,size=3) +
   scale_y_continuous(limits = c(246,285),breaks = seq(250,280,10)) + 
   scale_x_continuous(limits = c(-500,400),breaks = seq(-500,500,250)) +
-  theme(plot.title = element_text(size=11),plot.subtitle = element_text(size=10))
+  theme(plot.title=element_text(size=11),plot.subtitle=element_text(size=10)) 
 gg_pmodel_anom_gppnet
 
-# join plots
-ppS7 <- gg_pmodel_mean_gppnet + gg_pmodel_anom_gppnet + plot_layout(ncol = 2) +
+## Supplementary Fig. S6
+figS6 <- gg_pmodel_mean_gppnet + gg_pmodel_anom_gppnet + plot_layout(ncol = 2) +
   plot_annotation(tag_levels = 'A') #+ plot_layout(guides = "collect") & theme(legend.position = 'left')
-ppS7
-ggsave("~/phenoEOS/manuscript/figures/fig_S7_rev.png", width = 7.5, height = 4, dpi=300)
+figS6
+ggsave("~/phenoEOS/manuscript/figures/fig_S6_rev.png", width = 7.5, height = 4, dpi=300)

@@ -1,5 +1,5 @@
 # This script analyses the relationship of CO2 assimilation (simulated using the  P-model)
-# and phenological dates from local observations (PEP725 data). Outputs include Figure S2.
+# and phenological dates from local observations (PEP725 data). Outputs include Figure 1 and S3.
 
 # load packages
 library(dplyr)
@@ -83,7 +83,7 @@ lowerCI_unscaled <- out$coefficients["scale(gpp_net)","Estimate"]/ sd(df_pep$gpp
 out_anova <- anova(fit_iav_pep_off_vs_gppnet, fit_lt_pep_off_vs_gppnet_year)
 out_anova
 
-# Supplementary Fig. S2
+# Fig. 1
 ff_lt_pep_off_vs_gppnet_year <- gg_lt_pep_off_vs_gppnet_year +
   labs(title = expression(paste("EOS ~ ", bold("Year"), " + ", italic("A")[net])),subtitle  = "PEP data and P-model") + 
   theme(legend.position = "none",plot.subtitle=element_text(size=10))
@@ -101,10 +101,10 @@ ff_iav_pep_off_vs_gppnet <- gg_iav_pep_off_vs_gppnet +
         legend.margin = margin(.1, .1, .1, .1),
         legend.key.size = unit(.45, 'lines'),plot.subtitle=element_text(size=10)) 
 
-ss2 <- ff_lt_pep_off_vs_gppnet_year + ff_lt_pep_off_vs_gppnet + ff_iav_pep_off_vs_gppnet + 
+fig1 <- ff_lt_pep_off_vs_gppnet_year + ff_lt_pep_off_vs_gppnet + ff_iav_pep_off_vs_gppnet + 
   plot_annotation(tag_levels = 'A')
-ss2 
-ggsave("~/phenoEOS/manuscript/figures/fig_S2_rev.png", width = 9, height = 3.5, dpi=300)
+fig1 
+ggsave("~/phenoEOS/manuscript/figures/fig_1_rev.png", width = 9, height = 3.5, dpi=300)
 
 # Sensitivity analysis ####
 
@@ -239,7 +239,7 @@ out_pep_off_vs_gppnet_year <- allEffects(fit_lt_pep_off_vs_gppnet_year)
 gg_lt_pep_off_vs_gppnet_21J <- ggplot_lt_off_gppnet(out_pep_off_vs_gppnet_year)
 gg_lt_pep_off_vs_gppnet_year_21J <- ggplot_lt_off_gppnet_year(out_pep_off_vs_gppnet_year)
 
-# Supplementary Fig. S4
+# Supplementary Fig. S3
 ff_iav_pep_off_vs_gppnet_10h <- gg_iav_pep_off_vs_gppnet_10h +
   labs(title = expression(paste("EOS ~ ", italic("A")[net])), subtitle = 
          "") +
@@ -285,10 +285,10 @@ ff_lt_pep_off_vs_gppnet_21J <- gg_lt_pep_off_vs_gppnet_21J +
   labs(title = expression(paste("EOS ~ Year + ", bolditalic("A")[bold(net)])), subtitle = 
          "") +  theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
 
-ss3 <- ff_lt_pep_off_vs_gppnet_year_10h + ff_lt_pep_off_vs_gppnet_10h + ff_iav_pep_off_vs_gppnet_10h +
+figS3 <- ff_lt_pep_off_vs_gppnet_year_10h + ff_lt_pep_off_vs_gppnet_10h + ff_iav_pep_off_vs_gppnet_10h +
   ff_lt_pep_off_vs_gppnet_year_23S + ff_lt_pep_off_vs_gppnet_23S + ff_iav_pep_off_vs_gppnet_23S +
   ff_lt_pep_off_vs_gppnet_year_21J + ff_lt_pep_off_vs_gppnet_21J + ff_iav_pep_off_vs_gppnet_21J +
   plot_annotation(tag_levels = 'A') + 
   plot_layout(ncol = 3)
-ss3 
+figS3 
 ggsave("~/phenoEOS/manuscript/figures/fig_S3_rev.png", width = 8, height = 10, dpi=300)

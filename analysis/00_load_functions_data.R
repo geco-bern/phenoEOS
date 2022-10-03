@@ -335,7 +335,7 @@ ggplot_mean_on <- function(x){
   gg <- ggplot() + 
     geom_hex(data = parres18, aes(mean_on, off),bins = 60) + 
     scale_fill_gradientn("",colours = alpha(colorRampPalette( c("gray65", "navy", "red", "yellow"))(5),.7),
-                         trans = "log", limits=c(1,9500),breaks=c(5,50,500,4000)) +   
+                         trans = "log", limits=c(1,11300),breaks=c(5,50,500,4000)) +   
     geom_ribbon(data = df, aes(x = mean_on, ymin = lower, ymax = upper), alpha = 0.2, fill = "black") +
     geom_line(data = df, aes(mean_on, off), col = "black",size=.8) +
     theme_classic() +
@@ -352,7 +352,7 @@ ggplot_anom_on <- function(x){
   gg <- ggplot() + 
     geom_hex(data = parres19, aes(anom_on, off),bins = 60) + 
     scale_fill_gradientn("",colours = alpha(colorRampPalette( c("gray65", "navy", "red", "yellow"))(5),.7),
-                         trans = "log", limits=c(1,9500),breaks=c(5,50,500,4000)) +  
+                         trans = "log", limits=c(1,11300),breaks=c(5,50,500,4000)) +  
     geom_ribbon(data = df, aes(x = anom_on, ymin = lower, ymax = upper), alpha = 0.2, fill = "black") +
     geom_line(data = df, aes(anom_on, off), col = "black",size=.8) +
     theme_classic() +

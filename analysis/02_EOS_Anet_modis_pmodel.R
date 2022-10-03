@@ -1,5 +1,5 @@
 # This script analyses the relationship of CO2 assimilation (simulated using the p-model, 
-# and phenological dates from remote observations (MODIS data). Outputs include Figure 2.
+# and phenological dates from remote observations (MODIS data). Outputs include Figure 2 and S4.
 
 # load packages
 library(dplyr)
@@ -48,7 +48,6 @@ r.squaredGLMM(fit_iav_modis_off_vs_gppnet)
 plot(allEffects(fit_iav_modis_off_vs_gppnet))
 parres4 <- partialize(fit_iav_modis_off_vs_gppnet,"gpp_net") # calculate partial residuals
 out_iav_modis_off_vs_gppnet <- allEffects(fit_iav_modis_off_vs_gppnet)
-str(out_iav_modis_off_vs_gppnet)
 gg_iav_modis_off_vs_gppnet <- ggplot_gppnet_modis(out_iav_modis_off_vs_gppnet)
 gg_iav_modis_off_vs_gppnet
 
@@ -146,9 +145,9 @@ map_gpp <- ggplot(data = world) +
   scale_color_viridis(option="magma",limits=c(650,2550), breaks= seq(1000,2500,500)) +
   theme(legend.position="right", panel.background = element_rect(fill = "aliceblue"),axis.title=element_blank(),plot.title = element_text(size = 10))
 
-pp2 <- (ff_modis_mean_gppnet + ff_modis_anom_gppnet)/ map_eos / map_gpp +
+fig2 <- (ff_modis_mean_gppnet + ff_modis_anom_gppnet)/ map_eos / map_gpp +
  plot_annotation(tag_levels = 'A') + plot_layout(heights = c(1.5, 1, 1),widths = c(2, 1, 1))
-pp2
+fig2
 ggsave("~/phenoEOS/manuscript/figures/fig_2_rev.png", width = 9, height = 8, dpi=300)
 
 # Sensitivity analysis ####
@@ -313,18 +312,6 @@ ff_modis_anom_gppnet_10h <- gg_modis_anom_gppnet_10h +
         legend.margin = margin(.2, .2, .2, .2),
         legend.key.size = unit(.6, 'lines'),plot.subtitle=element_text(size=10)) 
 
-ff_modis_mean_gppnet_21J <- gg_modis_mean_gppnet_21J +
-  labs(title = expression(paste("EOS ~ ", bold("Mean "), bolditalic("A")[bold(net)], 
-                                " + Anomalies ", italic("A")[net])), 
-       subtitle = "MODIS data and P-model \nDOY threshold in June 21") +
-  theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
-
-ff_modis_anom_gppnet_21J <- gg_modis_anom_gppnet_21J +
-  labs(title = expression(paste("EOS ~ Mean ", italic("A")[net], " + " ,
-                                bold("Anomalies "), bolditalic("A")[bold(net)])), 
-       subtitle = "") +
-  theme(legend.position = "none",plot.subtitle=element_text(size=10))  
-
 ff_modis_mean_gppnet_23S <- gg_modis_mean_gppnet_23S +
   labs(title = expression(paste("EOS ~ ", bold("Mean "), bolditalic("A")[bold(net)], 
                                 " + Anomalies ", italic("A")[net])), 
@@ -337,11 +324,23 @@ ff_modis_anom_gppnet_23S <- gg_modis_anom_gppnet_23S +
        subtitle = "") +
   theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
 
-ss4 <- ff_modis_mean_gppnet_10h + ff_modis_anom_gppnet_10h +
+ff_modis_mean_gppnet_21J <- gg_modis_mean_gppnet_21J +
+  labs(title = expression(paste("EOS ~ ", bold("Mean "), bolditalic("A")[bold(net)], 
+                                " + Anomalies ", italic("A")[net])), 
+       subtitle = "MODIS data and P-model \nDOY threshold in June 21") +
+  theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
+
+ff_modis_anom_gppnet_21J <- gg_modis_anom_gppnet_21J +
+  labs(title = expression(paste("EOS ~ Mean ", italic("A")[net], " + " ,
+                                bold("Anomalies "), bolditalic("A")[bold(net)])), 
+       subtitle = "") +
+  theme(legend.position = "none",plot.subtitle=element_text(size=10))  
+
+figS4 <- ff_modis_mean_gppnet_10h + ff_modis_anom_gppnet_10h +
   ff_modis_mean_gppnet_23S + ff_modis_anom_gppnet_23S +
   ff_modis_mean_gppnet_21J + ff_modis_anom_gppnet_21J +
   plot_annotation(tag_levels = 'A') + 
   plot_layout(ncol = 2)
-ss4 
+figS4 
 ggsave("~/phenoEOS/manuscript/figures/fig_S4_rev.png", width = 7.5, height = 10.5, dpi=300)
 
