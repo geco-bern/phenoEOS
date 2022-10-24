@@ -46,6 +46,8 @@ trend_unscaled <- out$coefficients["scale(cA_tot)","Estimate"]/ sd(df_pep$cA_tot
 error_unscaled <- out$coefficients["scale(cA_tot)","Std. Error"]/ sd(df_pep$cA_tot)
 upperCI_unscaled <- out$coefficients["scale(cA_tot)","Estimate"]/ sd(df_pep$cA_tot) + out$coefficient["scale(cA_tot)","Std. Error"]/ sd(df_pep$cA_tot)*1.96
 lowerCI_unscaled <- out$coefficients["scale(cA_tot)","Estimate"]/ sd(df_pep$cA_tot) - out$coefficient["scale(cA_tot)","Std. Error"]/ sd(df_pep$cA_tot)*1.96
+trend_unscaled
+error_unscaled
 
 # Long-term trends ####
 # EOS ~ Anet LPJ + Year 
@@ -70,11 +72,15 @@ trend_unscaled <- out$coefficients["scale(year)","Estimate"]/ sd(df_pep$year)
 error_unscaled <- out$coefficients["scale(year)","Std. Error"]/ sd(df_pep$year)
 upperCI_unscaled <- out$coefficients["scale(year)","Estimate"]/ sd(df_pep$year) + out$coefficient["scale(year)","Std. Error"]/ sd(df_pep$year)*1.96
 lowerCI_unscaled <- out$coefficients["scale(year)","Estimate"]/ sd(df_pep$year) - out$coefficient["scale(year)","Std. Error"]/ sd(df_pep$year)*1.96
+trend_unscaled
+error_unscaled
 
 trend_unscaled <- out$coefficients["scale(cA_tot)","Estimate"]/ sd(df_pep$cA_tot)
 error_unscaled <- out$coefficients["scale(cA_tot)","Std. Error"]/ sd(df_pep$cA_tot)
 upperCI_unscaled <- out$coefficients["scale(cA_tot)","Estimate"]/ sd(df_pep$cA_tot) + out$coefficient["scale(cA_tot)","Std. Error"]/ sd(df_pep$cA_tot)*1.96
 lowerCI_unscaled <- out$coefficients["scale(cA_tot)","Estimate"]/ sd(df_pep$cA_tot) - out$coefficient["scale(cA_tot)","Std. Error"]/ sd(df_pep$cA_tot)*1.96
+trend_unscaled
+error_unscaled
 
 # Model comparison interannual vs. long-term
 out_anova <- anova(fit_iav_pep_off_vs_cAtot, fit_lt_pep_off_vs_cAtot_year)

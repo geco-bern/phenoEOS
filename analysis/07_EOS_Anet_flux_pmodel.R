@@ -44,6 +44,8 @@ out <- summary(fit_flux_anom_gpp)
 # Unscaled
 trend_unscaled <- out$coefficients["scale(mean_gpp_net)","Estimate"]/ sd(fluxnet_pmodel_pheno$mean_gpp_net,na.rm=T)
 error_unscaled <- out$coefficients["scale(mean_gpp_net)","Std. Error"]/ sd(fluxnet_pmodel_pheno$mean_gpp_net,na.rm=T)
+trend_unscaled
+error_unscaled
 
 gg_flux_mean_gpp <- plot_model(fit_flux_anom_gpp, type = "pred", terms = c("mean_gpp_net")) +
   theme_classic() +
@@ -102,6 +104,8 @@ out <- summary(fit_pmodel_anom_gpp)
 # Unscaled
 trend_unscaled <- out$coefficients["scale(mean_gpp_net)","Estimate"]/ sd(fluxnet_pmodel_pheno$mean_gpp_net,na.rm=T)
 error_unscaled <- out$coefficients["scale(mean_gpp_net)","Std. Error"]/ sd(fluxnet_pmodel_pheno$mean_gpp_net,na.rm=T)
+trend_unscaled
+error_unscaled
 
 gg_pmodel_mean_gpp <- plot_model(fit_pmodel_anom_gpp, type = "pred", terms = c("mean_gpp_net")) +
   theme_classic() +
@@ -170,6 +174,8 @@ out <- summary(fit_pmodel_anom_gppnet)
 # Unscaled
 trend_unscaled <- out$coefficients["scale(mean_gpp_net)","Estimate"]/ sd(fluxnet_pmodel_pheno$mean_gpp_net,na.rm=T)
 error_unscaled <- out$coefficients["scale(mean_gpp_net)","Std. Error"]/ sd(fluxnet_pmodel_pheno$mean_gpp_net,na.rm=T)
+trend_unscaled
+error_unscaled
 
 gg_pmodel_mean_gppnet <- plot_model(fit_pmodel_anom_gppnet, type = "pred", terms = c("mean_gpp_net")) +
   theme_classic() +

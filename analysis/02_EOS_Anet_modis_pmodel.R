@@ -85,9 +85,13 @@ gg_modis_mean_gppnet + gg_modis_anom_gppnet + plot_layout(guides = "collect") & 
 # Unscaled
 trend_unscaled <- out$coefficients["scale(mean_gpp_net)","Estimate"]/ sd(df_modis$mean_gpp_net)
 error_unscaled <- out$coefficients["scale(mean_gpp_net)","Std. Error"]/ sd(df_modis$mean_gpp_net)
+trend_unscaled
+error_unscaled
 
 trend_unscaled <- out$coefficients["scale(anom_gpp_net)","Estimate"]/ sd(df_modis$anom_gpp_net)
 error_unscaled <- out$coefficients["scale(anom_gpp_net)","Std. Error"]/ sd(df_modis$anom_gpp_net)
+trend_unscaled
+error_unscaled
 
 # Fig. 2 ####
 ff_modis_mean_gppnet <- gg_modis_mean_gppnet +

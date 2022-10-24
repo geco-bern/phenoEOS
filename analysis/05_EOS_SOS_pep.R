@@ -52,6 +52,8 @@ gg_lt_pep_off_vs_on + gg_lt_pep_off_vs_on_year
 # Unscaled
 trend_unscaled <- out$coefficients["scale(year)","Estimate"]/ sd(df_pep$year)
 error_unscaled <- out$coefficients["scale(year)","Std. Error"]/ sd(df_pep$year)
+trend_unscaled
+error_unscaled
 
 # Model comparison interannual vs. long-term
 out_anova <- anova(fit_iav_pep_off_vs_on, fit_lt_pep_off_vs_on_year, test="F")  #test="Chisq"

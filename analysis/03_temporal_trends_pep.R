@@ -45,6 +45,8 @@ gg_lt_pep_off_vs_year
 # Unscaled
 trend_unscaled <- out$coefficients["scale(year)","Estimate"]/ sd(df_pep$year)
 error_unscaled <- out$coefficients["scale(year)","Std. Error"]/ sd(df_pep$year)
+trend_unscaled
+error_unscaled
 
 # Anet P-model ~ Year ####
 fit_lt_pep_gppnet_vs_year <- lmer(gpp_net ~ scale(year) + (1|id_site) + (1|species), data = df_pep, REML = FALSE, na.action = "na.exclude")
@@ -60,6 +62,8 @@ gg_lt_pep_gppnet_vs_year
 # Unscaled
 trend_unscaled <- out$coefficients["scale(year)","Estimate"]/ sd(df_pep$year)
 error_unscaled <- out$coefficients["scale(year)","Std. Error"]/ sd(df_pep$year)
+trend_unscaled
+error_unscaled
 
 # Anet LPJ-GUESS ~ Year ####
 fit_lt_pep_cAtot_vs_year <- lmer(cA_tot ~ scale(year) + (1|id_site) + (1|species), data = df_pep, na.action = "na.exclude")
@@ -90,6 +94,8 @@ gg_lt_pep_on_vs_year
 # Unscaled
 trend_unscaled <- out$coefficients["scale(year)","Estimate"]/ sd(df_pep$year)
 error_unscaled <- out$coefficients["scale(year)","Std. Error"]/ sd(df_pep$year)
+trend_unscaled
+error_unscaled
 
 # ED Fig. 1 ####
 ff_lt_pep_off_vs_year <- gg_lt_pep_off_vs_year +

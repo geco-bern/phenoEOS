@@ -305,6 +305,7 @@ ggplot_lt_off_on_year <- function(x){
     geom_line(data = df, aes(year, off), col = "black",size=.6) +
     theme_classic() +
     scale_y_continuous(limits = c(175,365),breaks = seq(200,350,50)) + 
+    scale_x_continuous(breaks = seq(1950,2020,20)) + 
     labs(x = "Year", y = "EOS (DOY)")
   return(gg)
 }
@@ -340,6 +341,7 @@ ggplot_mean_on <- function(x){
     geom_line(data = df, aes(mean_on, off), col = "black",size=.6) +
     theme_classic() +
     scale_y_continuous(limits = c(0,365),breaks = seq(50,350,100)) + 
+    scale_x_continuous(breaks = seq(100,200,50)) + 
     labs(x = "Mean SOS (DOY)", y = "EOS (DOY)")
   return(gg)
 }
@@ -357,6 +359,7 @@ ggplot_anom_on <- function(x){
     geom_line(data = df, aes(anom_on, off), col = "black",size=.6) +
     theme_classic() +
     scale_y_continuous(limits = c(0,365),breaks = seq(50,350,100)) + 
+    scale_x_continuous(breaks = seq(-150,50,100)) + 
     labs(x = "Anomalies SOS (DOY)", y = "EOS (DOY)")
   return(gg)
 }
