@@ -1,5 +1,6 @@
 # This script analyses the relationship of CO2 assimilation (simulated using the LPJ-GUESS model)
-# and phenological dates from local observations (PEP725 data). Outputs include Figure S2.
+# and phenological dates from ground observations (PEP725 data). Outputs include ED Fig. 2.
+.
 
 # load packages
 library(dplyr)
@@ -24,7 +25,7 @@ df_pep <- data.table::fread("~/phenoEOS/data/DataMeta_3_Drivers_20_11_10.csv") %
   mutate(id_site=as.character(id_site))
 length(unique(df_pep$id_site)) #3855
 
-# Interannual variation (IAV)
+# Interannual variation (IAV) ####
 # EOS ~ Anet LPJ-GUESS
 fit_iav_pep_off_vs_cAtot = lmer(off ~ scale(cA_tot) + (1|id_site) + (1|species) , data = df_pep, na.action = "na.exclude")
 summary(fit_iav_pep_off_vs_cAtot)
@@ -46,7 +47,7 @@ error_unscaled <- out$coefficients["scale(cA_tot)","Std. Error"]/ sd(df_pep$cA_t
 upperCI_unscaled <- out$coefficients["scale(cA_tot)","Estimate"]/ sd(df_pep$cA_tot) + out$coefficient["scale(cA_tot)","Std. Error"]/ sd(df_pep$cA_tot)*1.96
 lowerCI_unscaled <- out$coefficients["scale(cA_tot)","Estimate"]/ sd(df_pep$cA_tot) - out$coefficient["scale(cA_tot)","Std. Error"]/ sd(df_pep$cA_tot)*1.96
 
-# Long-term trends
+# Long-term trends ####
 # EOS ~ Anet LPJ + Year 
 fit_lt_pep_off_vs_cAtot_year = lmer(off ~ scale(cA_tot) + scale(year) + (1|id_site) + (1|species), data = df_pep, na.action = "na.exclude")
 summary(fit_lt_pep_off_vs_cAtot_year)
@@ -79,16 +80,22 @@ lowerCI_unscaled <- out$coefficients["scale(cA_tot)","Estimate"]/ sd(df_pep$cA_t
 out_anova <- anova(fit_iav_pep_off_vs_cAtot, fit_lt_pep_off_vs_cAtot_year)
 out_anova
 
-# Supplementary Fig. S2
+# ED Fig. 2 ####
 ff_lt_pep_off_vs_year <- gg_lt_pep_off_vs_year +
   labs(title = expression(paste("EOS ~ ", bold("Year"), " + ", italic("A")[net])), 
        subtitle = "PEP data and LPJ") +
-  theme(legend.position = "none",plot.subtitle=element_text(size=10))  
+  theme(legend.position = "none",
+        plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+        axis.text=element_text(size=6),
+        axis.title=element_text(size=7))
 
 ff_lt_pep_off_vs_cAtot <- gg_lt_pep_off_vs_cAtot +
   labs(title = expression(paste("EOS ~ Year + ", bolditalic("A")[bold(net)])), 
        subtitle = "") +
-  theme(legend.position = "none",plot.subtitle=element_text(size=10))  
+  theme(legend.position = "none",
+        plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+        axis.text=element_text(size=6),
+        axis.title=element_text(size=7)) 
 
 ff_iav_pep_off_vs_cAtot <- gg_iav_pep_off_vs_cAtot +
   labs(title = expression(paste("EOS ~ ", italic("A")[net])), 
@@ -97,10 +104,15 @@ ff_iav_pep_off_vs_cAtot <- gg_iav_pep_off_vs_cAtot +
         legend.key = element_rect(fill = NA, color = NA),
         legend.position = c(.85, .95),
         legend.direction="vertical",
-        legend.margin = margin(.2, .2, .2, .2),
-        legend.key.size = unit(.6, 'lines'),plot.subtitle=element_text(size=10))  
+        legend.margin = margin(.1, .1, .1, .1),
+        legend.key.size = unit(.45, 'lines'),
+        plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+        axis.text=element_text(size=6),
+        axis.title=element_text(size=7),
+        legend.text = element_text(size=6))
 
-figS2 <- ff_lt_pep_off_vs_year + ff_lt_pep_off_vs_cAtot + ff_iav_pep_off_vs_cAtot +
- plot_annotation(tag_levels = 'A') #+ plot_layout(guides = "collect") & theme(legend.position = 'left')
-figS2
-ggsave("~/phenoEOS/manuscript/figures/fig_S2_rev.png", width = 9, height = 3.5, dpi=300)
+figED2 <- ff_lt_pep_off_vs_year + ff_lt_pep_off_vs_cAtot + ff_iav_pep_off_vs_cAtot + 
+  plot_annotation(tag_levels = 'A',tag_suffix = ')') & theme(plot.tag = element_text(size = 7))
+figED2
+ggsave("~/phenoEOS/manuscript/figures/ED_Fig2.jpg", width = 180, height = 70, units="mm",dpi=300)
+ggsave("~/phenoEOS/manuscript/figures/ED_Fig2.eps", device=cairo_ps, width = 180, height = 70, units="mm", dpi=300)

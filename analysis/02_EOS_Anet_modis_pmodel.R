@@ -1,5 +1,6 @@
 # This script analyses the relationship of CO2 assimilation (simulated using the p-model, 
-# and phenological dates from remote observations (MODIS data). Outputs include Figure 2 and S4.
+# and phenological dates from remote-sensing observations (MODIS data). Outputs include Fig. 2.
+# A sensitivity analysis for the definition of growing season has been carried out. Outputs include ED Fig.4.
 
 # load packages
 library(dplyr)
@@ -38,7 +39,7 @@ df_modis <- modis_pheno_sites %>%
 df_modis <- df_modis %>% rename(on = SOS_2_doy, off = EOS_2_doy) %>% filter(off>on)
 length(unique(df_modis$sitename)) #4879
 
-# Interannual variation (IAV)
+# Interannual variation (IAV) ####
 # EOS ~ Anet P-model
 fit_iav_modis_off_vs_gppnet = lmer(off ~ scale(gpp_net) + (1|sitename) , data = df_modis, na.action = "na.exclude")
 summary(fit_iav_modis_off_vs_gppnet)
@@ -51,7 +52,8 @@ out_iav_modis_off_vs_gppnet <- allEffects(fit_iav_modis_off_vs_gppnet)
 gg_iav_modis_off_vs_gppnet <- ggplot_gppnet_modis(out_iav_modis_off_vs_gppnet)
 gg_iav_modis_off_vs_gppnet
 
-# Long-term separating mean across years 2001-2018 from interannual anomaly.
+# Long-term trends ####
+# separating mean across years 2001-2018 from interannual anomaly.
 # EOS ~ Mean Anet + Anomalies Anet
 separate_anom <- function(df){
   df_mean <- df %>% 
@@ -87,11 +89,16 @@ error_unscaled <- out$coefficients["scale(mean_gpp_net)","Std. Error"]/ sd(df_mo
 trend_unscaled <- out$coefficients["scale(anom_gpp_net)","Estimate"]/ sd(df_modis$anom_gpp_net)
 error_unscaled <- out$coefficients["scale(anom_gpp_net)","Std. Error"]/ sd(df_modis$anom_gpp_net)
 
-# Figure 2
+# Fig. 2 ####
 ff_modis_mean_gppnet <- gg_modis_mean_gppnet +
   labs(title = expression(paste("EOS ~ ", bold("Mean "), bolditalic("A")[bold(net)], 
                                 " + Anomalies ", italic("A")[net])), subtitle = "MODIS data and P-model") +
-  theme(legend.position = "none",plot.subtitle=element_text(size=10))  
+  theme(legend.position = "none",
+        plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+        axis.text=element_text(size=6),
+        axis.title=element_text(size=7),
+        legend.text = element_text(size=6),
+        legend.title = element_blank())
 
 ff_modis_anom_gppnet <- gg_modis_anom_gppnet +
   labs(title = expression(paste("EOS ~ Mean ", italic("A")[net], " + " ,
@@ -100,7 +107,12 @@ ff_modis_anom_gppnet <- gg_modis_anom_gppnet +
         legend.position = c(.15, .25),
         legend.direction="vertical",
         legend.margin = margin(.2, .2, .2, .2),
-        legend.key.size = unit(.6, 'lines'),plot.subtitle=element_text(size=10))  
+        legend.key.size = unit(.6, 'lines'),
+        plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+        axis.text=element_text(size=6),
+        axis.title=element_text(size=7),
+        legend.text = element_text(size=6),
+        legend.title = element_blank())
 
 # Maps
 lon_breaks <- seq(from = floor(min(df_modis$lon)), to = ceiling(max(df_modis$lon)), by = 0.1)
@@ -135,7 +147,12 @@ map_eos <- ggplot(data = world) +
   geom_point(data = df_modis_agg, aes(x = lon, y = lat, color = mean_eos),size=.3) +
   labs(color="EOS (DOY)        ") +
   scale_color_viridis(option="viridis",limits=c(235,342), breaks= seq(240,340,20)) +
-  theme(legend.position="right", panel.background = element_rect(fill = "aliceblue"),axis.title=element_blank(),plot.title = element_text(size = 10)) 
+  theme(legend.position="right", panel.background = element_rect(fill = "aliceblue"),
+        axis.title=element_blank(),
+        plot.title=element_text(size=7),
+        axis.text=element_text(size=6),
+        legend.text = element_text(size=6),
+        legend.title = element_text(size=6))
 
 map_gpp <- ggplot(data = world) + 
   geom_sf(fill= "grey",size=.3) + 
@@ -143,12 +160,19 @@ map_gpp <- ggplot(data = world) +
   geom_point(data = df_modis_agg, aes(x = lon, y = lat, color = mean_gpp),size=.3) +
   labs(color=expression(paste(italic("A")[net], " (gC m"^-2, " yr"^-1, ")"))) +
   scale_color_viridis(option="magma",limits=c(650,2550), breaks= seq(1000,2500,500)) +
-  theme(legend.position="right", panel.background = element_rect(fill = "aliceblue"),axis.title=element_blank(),plot.title = element_text(size = 10))
+  theme(legend.position="right", panel.background = element_rect(fill = "aliceblue"),
+        axis.title=element_blank(),
+        plot.title=element_text(size=7),
+        axis.text=element_text(size=6),
+        legend.text = element_text(size=6),
+        legend.title = element_text(size=6))
 
 fig2 <- (ff_modis_mean_gppnet + ff_modis_anom_gppnet)/ map_eos / map_gpp +
- plot_annotation(tag_levels = 'A') + plot_layout(heights = c(1.5, 1, 1),widths = c(2, 1, 1))
+ plot_layout(heights = c(1.5, 1, 1),widths = c(2, 1, 1)) +
+ plot_annotation(tag_levels = 'A',tag_suffix = ')') & theme(plot.tag = element_text(size = 7))
 fig2
-ggsave("~/phenoEOS/manuscript/figures/fig_2_rev.png", width = 9, height = 8, dpi=300)
+ggsave("~/phenoEOS/manuscript/figures/Fig_2.jpg", width = 180, height = 160, units="mm",dpi=300)
+ggsave("~/phenoEOS/manuscript/figures/Fig_2.eps", device=cairo_ps, width = 180, height = 160, units="mm", dpi=300)
 
 # Sensitivity analysis ####
 
@@ -295,52 +319,74 @@ out_modis_anom_gppnet <- allEffects(fit_modis_anom_gppnet)
 gg_modis_mean_gppnet_21J <- ggplot_mean_gppnet(out_modis_anom_gppnet)
 gg_modis_anom_gppnet_21J <- ggplot_anom_gppnet(out_modis_anom_gppnet)
 
-# Supplementary Fig. S4
+# ED Fig. 4 ####
 ff_modis_mean_gppnet_10h <- gg_modis_mean_gppnet_10h +
   labs(title = expression(paste("EOS ~ ", bold("Mean "), bolditalic("A")[bold(net)], 
                                 " + Anomalies ", italic("A")[net])), 
        subtitle = "MODIS data and P-model \nDaylength threshold of 10 h.") +
-  theme(legend.position = "none",plot.title=element_text(size=11.5),plot.subtitle=element_text(size=10))   
+  theme(legend.position = "none",
+        plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+        axis.text=element_text(size=6),
+        axis.title=element_text(size=7),
+        legend.text = element_text(size=6))  
 
 ff_modis_anom_gppnet_10h <- gg_modis_anom_gppnet_10h +
   labs(title = expression(paste("EOS ~ Mean ", italic("A")[net], " + " ,
-                                bold("Anomalies "), bolditalic("A")[bold(net)])), 
-       subtitle = "") +
+                                bold("Anomalies "), bolditalic("A")[bold(net)])), subtitle = "") +
   theme(legend.key = element_rect(fill = NA, color = NA),
-        legend.position = c(.15, .25),
+        legend.position = c(.15, .19),
         legend.direction="vertical",
-        legend.margin = margin(.2, .2, .2, .2),
-        legend.key.size = unit(.6, 'lines'),plot.title=element_text(size=11.5),plot.subtitle=element_text(size=10))   
+        legend.margin = margin(.1, .1, .1, .1),
+        legend.key.size = unit(.38, 'lines'),
+        plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+        axis.text=element_text(size=6),
+        axis.title=element_text(size=7),
+        legend.text = element_text(size=6),
+        legend.title = element_blank())
 
 ff_modis_mean_gppnet_23S <- gg_modis_mean_gppnet_23S +
   labs(title = expression(paste("EOS ~ ", bold("Mean "), bolditalic("A")[bold(net)], 
                                 " + Anomalies ", italic("A")[net])), 
        subtitle = "MODIS data and P-model \nDOY threshold in Sept 23") +
-  theme(legend.position = "none",plot.title=element_text(size=11.5),plot.subtitle=element_text(size=10))   
+  theme(legend.position = "none",
+        plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+        axis.text=element_text(size=6),
+        axis.title=element_text(size=7),
+        legend.text = element_text(size=6))  
 
 ff_modis_anom_gppnet_23S <- gg_modis_anom_gppnet_23S +
   labs(title = expression(paste("EOS ~ Mean ", italic("A")[net], " + " ,
-                                bold("Anomalies "), bolditalic("A")[bold(net)])), 
-       subtitle = "") +
-  theme(legend.position = "none",plot.title=element_text(size=11.5),plot.subtitle=element_text(size=10))  
+                                bold("Anomalies "), bolditalic("A")[bold(net)])), subtitle = "") +
+  theme(legend.position = "none",
+        plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+        axis.text=element_text(size=6),
+        axis.title=element_text(size=7),
+        legend.text = element_text(size=6))  
 
 ff_modis_mean_gppnet_21J <- gg_modis_mean_gppnet_21J +
   labs(title = expression(paste("EOS ~ ", bold("Mean "), bolditalic("A")[bold(net)], 
                                 " + Anomalies ", italic("A")[net])), 
        subtitle = "MODIS data and P-model \nDOY threshold in June 21") +
-  theme(legend.position = "none",plot.title=element_text(size=11.5),plot.subtitle=element_text(size=10))   
+  theme(legend.position = "none",
+        plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+        axis.text=element_text(size=6),
+        axis.title=element_text(size=7),
+        legend.text = element_text(size=6))  
 
 ff_modis_anom_gppnet_21J <- gg_modis_anom_gppnet_21J +
   labs(title = expression(paste("EOS ~ Mean ", italic("A")[net], " + " ,
-                                bold("Anomalies "), bolditalic("A")[bold(net)])), 
-       subtitle = "") +
-  theme(legend.position = "none",plot.title=element_text(size=11.5),plot.subtitle=element_text(size=10))  
+                                bold("Anomalies "), bolditalic("A")[bold(net)])), subtitle = "") +
+  theme(legend.position = "none",
+        plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+        axis.text=element_text(size=6),
+        axis.title=element_text(size=7),
+        legend.text = element_text(size=6))  
 
-figS4 <- ff_modis_mean_gppnet_10h + ff_modis_anom_gppnet_10h +
+figED4 <- ff_modis_mean_gppnet_10h + ff_modis_anom_gppnet_10h +
   ff_modis_mean_gppnet_23S + ff_modis_anom_gppnet_23S +
   ff_modis_mean_gppnet_21J + ff_modis_anom_gppnet_21J +
-  plot_annotation(tag_levels = 'A') + 
-  plot_layout(ncol = 2)
-figS4 
-ggsave("~/phenoEOS/manuscript/figures/fig_S4_rev.png", width = 7, height = 11, dpi=300)
-
+  plot_layout(ncol = 2) + 
+  plot_annotation(tag_levels = 'A',tag_suffix = ')') & theme(plot.tag = element_text(size = 7))
+figED4 
+ggsave("~/phenoEOS/manuscript/figures/ED_Fig4.jpg", width = 120, height = 180, units="mm",dpi=300)
+ggsave("~/phenoEOS/manuscript/figures/ED_Fig4.eps", device=cairo_ps, width = 120, height = 180, units="mm", dpi=300)

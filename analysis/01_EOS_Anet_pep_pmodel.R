@@ -1,5 +1,6 @@
 # This script analyses the relationship of CO2 assimilation (simulated using the  P-model)
-# and phenological dates from local observations (PEP725 data). Outputs include Figure 1 and S3.
+# and phenological dates from ground observations (PEP725 data). Outputs include Fig.1.
+# A sensitivity analysis for the definition of growing season has been carried out. Outputs include ED Fig.3.
 
 # load packages
 library(dplyr)
@@ -34,7 +35,7 @@ df_pep <- df_pep %>%
   left_join(pep_pmodel) %>%
   mutate(id_site=as.factor(id_site),species=as.factor(species))
 
-# Interannual variation (IAV)
+# Interannual variation (IAV) ####
 # EOS ~ Anet P-model
 fit_iav_pep_off_vs_gppnet = lmer(off ~ scale(gpp_net) + (1|id_site) + (1|species), data = df_pep, na.action = "na.exclude")
 summary(fit_iav_pep_off_vs_gppnet)
@@ -52,7 +53,7 @@ error_unscaled <- out$coefficients["scale(gpp_net)","Std. Error"]/ sd(df_pep$gpp
 upperCI_unscaled <- out$coefficients["scale(gpp_net)","Estimate"]/ sd(df_pep$gpp_net) + out$coefficient["scale(gpp_net)","Std. Error"]/ sd(df_pep$gpp_net)*1.96
 lowerCI_unscaled <- out$coefficients["scale(gpp_net)","Estimate"]/ sd(df_pep$gpp_net) - out$coefficient["scale(gpp_net)","Std. Error"]/ sd(df_pep$gpp_net)*1.96
 
-# Long-term trends
+# Long-term trends ####
 # EOS ~ Anet P-model + Year 
 fit_lt_pep_off_vs_gppnet_year = lmer(off ~ scale(gpp_net) + scale(year) + (1|id_site) + (1|species), data = df_pep, na.action = "na.exclude")
 summary(fit_lt_pep_off_vs_gppnet_year)
@@ -83,28 +84,38 @@ lowerCI_unscaled <- out$coefficients["scale(gpp_net)","Estimate"]/ sd(df_pep$gpp
 out_anova <- anova(fit_iav_pep_off_vs_gppnet, fit_lt_pep_off_vs_gppnet_year)
 out_anova
 
-# Fig. 1
+# Fig. 1 ####
 ff_lt_pep_off_vs_gppnet_year <- gg_lt_pep_off_vs_gppnet_year +
   labs(title = expression(paste("EOS ~ ", bold("Year"), " + ", italic("A")[net])),subtitle  = "PEP data and P-model") + 
-  theme(legend.position = "none",plot.subtitle=element_text(size=10))
+  theme(legend.position = "none",
+        plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+        axis.text=element_text(size=6),
+        axis.title=element_text(size=7))
 
 ff_lt_pep_off_vs_gppnet <- gg_lt_pep_off_vs_gppnet +
   labs(title = expression(paste("EOS ~ Year + ", bolditalic("A")[bold(net)]))) + 
-  theme(legend.position = "none",plot.subtitle=element_text(size=10))
+  theme(legend.position = "none",plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+        axis.text=element_text(size=6),
+        axis.title=element_text(size=7))
 
 ff_iav_pep_off_vs_gppnet <- gg_iav_pep_off_vs_gppnet +
   labs(title = expression(paste("EOS ~ ", italic("A")[net]))) +
   theme(#plot.background = element_rect(colour = "darkgrey", fill=NA, size=2),
         legend.key = element_rect(fill = NA, color = NA),
-        legend.position = c(.15, .20),
+        legend.position = c(.15, .22),
         legend.direction="vertical",
         legend.margin = margin(.1, .1, .1, .1),
-        legend.key.size = unit(.45, 'lines'),plot.subtitle=element_text(size=10)) 
+        legend.key.size = unit(.45, 'lines'),
+        plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+        axis.text=element_text(size=6),
+        axis.title=element_text(size=7),
+        legend.text = element_text(size=6))
 
 fig1 <- ff_lt_pep_off_vs_gppnet_year + ff_lt_pep_off_vs_gppnet + ff_iav_pep_off_vs_gppnet + 
-  plot_annotation(tag_levels = 'A')
+  plot_annotation(tag_levels = 'A',tag_suffix = ')') & theme(plot.tag = element_text(size = 7))
 fig1 
-ggsave("~/phenoEOS/manuscript/figures/fig_1_rev.png", width = 9, height = 3.5, dpi=300)
+ggsave("~/phenoEOS/manuscript/figures/Fig_1.jpg", width = 180, height = 70, units="mm",dpi=300)
+ggsave("~/phenoEOS/manuscript/figures/Fig_1.eps", device=cairo_ps, width = 180, height = 70, units="mm", dpi=300)
 
 # Sensitivity analysis ####
 
@@ -239,56 +250,93 @@ out_pep_off_vs_gppnet_year <- allEffects(fit_lt_pep_off_vs_gppnet_year)
 gg_lt_pep_off_vs_gppnet_21J <- ggplot_lt_off_gppnet(out_pep_off_vs_gppnet_year)
 gg_lt_pep_off_vs_gppnet_year_21J <- ggplot_lt_off_gppnet_year(out_pep_off_vs_gppnet_year)
 
-# Supplementary Fig. S3
+# ED Fig. 3 ####
 ff_iav_pep_off_vs_gppnet_10h <- gg_iav_pep_off_vs_gppnet_10h +
   labs(title = expression(paste("EOS ~ ", italic("A")[net])), subtitle = 
          "") +
-  theme(#plot.background = element_rect(colour = "darkgrey", fill=NA, size=2),
-    legend.key = element_rect(fill = NA, color = NA),
-    legend.position = c(.15, .20),
+  theme(legend.key = element_rect(fill = NA, color = NA),
+    legend.position = c(.15, .19),
     legend.direction="vertical",
     legend.margin = margin(.1, .1, .1, .1),
-    legend.key.size = unit(.45, 'lines'))
+    legend.key.size = unit(.38, 'lines'),
+    plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+    axis.text=element_text(size=6),
+    axis.title=element_text(size=7),
+    legend.text = element_text(size=6),
+    legend.title = element_blank())
 
 ff_lt_pep_off_vs_gppnet_year_10h <- gg_lt_pep_off_vs_gppnet_year_10h +
   labs(title = expression(paste("EOS ~ ", bold("Year"), " + ", italic("A")[net])), subtitle = 
          "PEP data and P-model \nDaylength threshold of 10 h.") +  
-  theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
+  theme(legend.position = "none",
+        plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+        axis.text=element_text(size=6),
+        axis.title=element_text(size=7),
+        legend.text = element_text(size=6)) 
 
 ff_lt_pep_off_vs_gppnet_10h <- gg_lt_pep_off_vs_gppnet_10h +
   labs(title = expression(paste("EOS ~ Year + ", bolditalic("A")[bold(net)])), subtitle = 
-         "") +  theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
+         "") +  theme(legend.position = "none",
+                      plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+                      axis.text=element_text(size=6),
+                      axis.title=element_text(size=7),
+                      legend.text = element_text(size=6)) 
 
 ff_iav_pep_off_vs_gppnet_23S <- gg_iav_pep_off_vs_gppnet_23S +
   labs(title = expression(paste("EOS ~ ", italic("A")[net])), subtitle = 
-         "") +  theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
+         "") +  theme(legend.position = "none",
+                      plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+                      axis.text=element_text(size=6),
+                      axis.title=element_text(size=7),
+                      legend.text = element_text(size=6))  
 
 ff_lt_pep_off_vs_gppnet_year_23S <- gg_lt_pep_off_vs_gppnet_year_23S +
   labs(title = expression(paste("EOS ~ ", bold("Year"), " + ", italic("A")[net])), subtitle = 
          "PEP data and P-model \nDOY threshold in Sept 23") +  
-  theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
+  theme(legend.position = "none",
+        plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+        axis.text=element_text(size=6),
+        axis.title=element_text(size=7),
+        legend.text = element_text(size=6))  
 
 ff_lt_pep_off_vs_gppnet_23S <- gg_lt_pep_off_vs_gppnet_23S +
   labs(title = expression(paste("EOS ~ Year + ", bolditalic("A")[bold(net)])), subtitle = 
-         "") +  theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
+         "") +  theme(legend.position = "none",
+                      plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+                      axis.text=element_text(size=6),
+                      axis.title=element_text(size=7),
+                      legend.text = element_text(size=6)) 
 
 ff_iav_pep_off_vs_gppnet_21J <- gg_iav_pep_off_vs_gppnet_21J +
   labs(title = expression(paste("EOS ~ ", italic("A")[net])), subtitle = 
-         "") +  theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
+         "") +  theme(legend.position = "none",
+                      plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+                      axis.text=element_text(size=6),
+                      axis.title=element_text(size=7),
+                      legend.text = element_text(size=6))  
 
 ff_lt_pep_off_vs_gppnet_year_21J <- gg_lt_pep_off_vs_gppnet_year_21J +
   labs(title = expression(paste("EOS ~ ", bold("Year"), " + ", italic("A")[net])), subtitle = 
          "PEP data and P-model \nDOY threshold in June 21") +  
-  theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
+  theme(legend.position = "none",
+        plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+        axis.text=element_text(size=6),
+        axis.title=element_text(size=7),
+        legend.text = element_text(size=6))  
 
 ff_lt_pep_off_vs_gppnet_21J <- gg_lt_pep_off_vs_gppnet_21J +
   labs(title = expression(paste("EOS ~ Year + ", bolditalic("A")[bold(net)])), subtitle = 
-         "") +  theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
+         "") +  theme(legend.position = "none",
+                      plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+                      axis.text=element_text(size=6),
+                      axis.title=element_text(size=7),
+                      legend.text = element_text(size=6))  
 
-figS3 <- ff_lt_pep_off_vs_gppnet_year_10h + ff_lt_pep_off_vs_gppnet_10h + ff_iav_pep_off_vs_gppnet_10h +
+figED3 <- ff_lt_pep_off_vs_gppnet_year_10h + ff_lt_pep_off_vs_gppnet_10h + ff_iav_pep_off_vs_gppnet_10h +
   ff_lt_pep_off_vs_gppnet_year_23S + ff_lt_pep_off_vs_gppnet_23S + ff_iav_pep_off_vs_gppnet_23S +
   ff_lt_pep_off_vs_gppnet_year_21J + ff_lt_pep_off_vs_gppnet_21J + ff_iav_pep_off_vs_gppnet_21J +
-  plot_annotation(tag_levels = 'A') + 
-  plot_layout(ncol = 3)
-figS3 
-ggsave("~/phenoEOS/manuscript/figures/fig_S3_rev.png", width = 8, height = 10, dpi=300)
+  plot_layout(ncol = 3) + 
+  plot_annotation(tag_levels = 'A',tag_suffix = ')') & theme(plot.tag = element_text(size = 7))
+figED3 
+ggsave("~/phenoEOS/manuscript/figures/ED_Fig3.jpg", width = 170, height = 190, units="mm",dpi=300)
+ggsave("~/phenoEOS/manuscript/figures/ED_Fig3.eps", device=cairo_ps, width = 170, height = 190, units="mm", dpi=300)

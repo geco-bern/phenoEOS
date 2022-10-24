@@ -1,5 +1,5 @@
 # This script analyses the temporal trends of CO2 assimilation (estimations from both LPJ-GUESS and P-model) 
-# and phenological dates from local observations (PEP725 data). Outputs include Figure S1.
+# and phenological dates from ground observations (PEP725 data). Outputs include ED Fig. 1.
 
 # load packages
 library(dplyr)
@@ -31,7 +31,7 @@ pep_pmodel <- pep_pmodel %>%
 df_pep <- df_pep %>% 
   left_join(pep_pmodel)
 
-# EOS ~ Year
+# EOS ~ Year ####
 fit_lt_pep_off_vs_year <- lmer(off ~ scale(year) + (1|id_site) + (1|species), data = df_pep, na.action = "na.exclude")
 summary(fit_lt_pep_off_vs_year)
 out <- summary(fit_lt_pep_off_vs_year)
@@ -46,7 +46,7 @@ gg_lt_pep_off_vs_year
 trend_unscaled <- out$coefficients["scale(year)","Estimate"]/ sd(df_pep$year)
 error_unscaled <- out$coefficients["scale(year)","Std. Error"]/ sd(df_pep$year)
 
-# Anet P-model ~ Year
+# Anet P-model ~ Year ####
 fit_lt_pep_gppnet_vs_year <- lmer(gpp_net ~ scale(year) + (1|id_site) + (1|species), data = df_pep, REML = FALSE, na.action = "na.exclude")
 summary(fit_lt_pep_gppnet_vs_year)
 out <- summary(fit_lt_pep_gppnet_vs_year)
@@ -61,7 +61,7 @@ gg_lt_pep_gppnet_vs_year
 trend_unscaled <- out$coefficients["scale(year)","Estimate"]/ sd(df_pep$year)
 error_unscaled <- out$coefficients["scale(year)","Std. Error"]/ sd(df_pep$year)
 
-# Anet LPJ-GUESS ~ Year
+# Anet LPJ-GUESS ~ Year ####
 fit_lt_pep_cAtot_vs_year <- lmer(cA_tot ~ scale(year) + (1|id_site) + (1|species), data = df_pep, na.action = "na.exclude")
 summary(fit_lt_pep_cAtot_vs_year)
 out <- summary(fit_lt_pep_cAtot_vs_year)
@@ -76,7 +76,7 @@ gg_lt_pep_cAtot_vs_year
 #trend_unscaled <- out$coefficients["scale(year)","Estimate"]/ sd(df_pep$year)
 #error_unscaled <- out$coefficients["scale(year)","Std. Error"]/ sd(df_pep$year)
 
-# SOS ~ Year
+# SOS ~ Year ####
 fit_lt_pep_on_vs_year <- lmer(on ~ scale(year) + (1|id_site) + (1|species), data = df_pep,REML = F, na.action = "na.exclude")
 summary(fit_lt_pep_on_vs_year)
 out <- summary(fit_lt_pep_on_vs_year)
@@ -91,20 +91,29 @@ gg_lt_pep_on_vs_year
 trend_unscaled <- out$coefficients["scale(year)","Estimate"]/ sd(df_pep$year)
 error_unscaled <- out$coefficients["scale(year)","Std. Error"]/ sd(df_pep$year)
 
-# Supplementary Fig. S1
+# ED Fig. 1 ####
 ff_lt_pep_off_vs_year <- gg_lt_pep_off_vs_year +
   labs(title = "EOS ~ Year", subtitle = "PEP data") +
-  theme(legend.position = "none",plot.subtitle=element_text(size=10))
+  theme(legend.position = "none",
+        plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+        axis.text=element_text(size=6),
+        axis.title=element_text(size=7))
 
 ff_lt_pep_gppnet_vs_year <- gg_lt_pep_gppnet_vs_year +
   labs(title = expression(paste(italic("A")[net], " ~ Year")), subtitle = "PEP data and P-model",
        y = expression(paste(italic("A")[net], " (gC m"^-2, " yr"^-1, ")")), x = "Year") +
-  theme(legend.position = "none",plot.subtitle=element_text(size=10))
+  theme(legend.position = "none",
+        plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+        axis.text=element_text(size=6),
+        axis.title=element_text(size=7))
 
 ff_lt_pep_cAtot_vs_year <- gg_lt_pep_cAtot_vs_year +
   labs(title = expression(paste(italic("A")[net], " ~ Year")), subtitle = "PEP data and LPJ model",
        y = expression(paste(italic("A")[net], " (gC m"^-2, " yr"^-1, ")")), x = "Year") +
-  theme(legend.position = "none",plot.subtitle=element_text(size=10))
+  theme(legend.position = "none",
+        plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+        axis.text=element_text(size=6),
+        axis.title=element_text(size=7))
 
 ff_lt_pep_on_vs_year <- gg_lt_pep_on_vs_year +
   labs(title = "SOS ~ Year", subtitle = "PEP data",
@@ -112,9 +121,15 @@ ff_lt_pep_on_vs_year <- gg_lt_pep_on_vs_year +
   theme(legend.key = element_rect(fill = NA, color = NA),
         legend.position = c(.85, .95),
         legend.direction="vertical",
-        legend.margin = margin(.2, .2, .2, .2),
-        legend.key.size = unit(.6, 'lines'),plot.subtitle=element_text(size=10))
+        legend.margin = margin(.1, .1, .1, .1),
+        legend.key.size = unit(.3, 'lines'),
+        plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+        axis.text=element_text(size=6),
+        axis.title=element_text(size=7),
+        legend.text = element_text(size=6))
 
-figS1 <- (ff_lt_pep_off_vs_year + ff_lt_pep_gppnet_vs_year)/(ff_lt_pep_cAtot_vs_year + ff_lt_pep_on_vs_year) + plot_annotation(tag_levels = 'A')
-figS1 
-ggsave("~/phenoEOS/manuscript/figures/fig_S1_rev.png", width = 7.5, height = 7.5, dpi=300)
+figED1 <- (ff_lt_pep_off_vs_year + ff_lt_pep_gppnet_vs_year)/(ff_lt_pep_cAtot_vs_year + ff_lt_pep_on_vs_year) + 
+  plot_annotation(tag_levels = 'A',tag_suffix = ')') & theme(plot.tag = element_text(size = 7))
+figED1 
+ggsave("~/phenoEOS/manuscript/figures/ED_Fig1.jpg", width = 120, height = 120, units="mm",dpi=300)
+ggsave("~/phenoEOS/manuscript/figures/ED_Fig1.eps", device=cairo_ps, width = 120, height = 120, units="mm", dpi=300)

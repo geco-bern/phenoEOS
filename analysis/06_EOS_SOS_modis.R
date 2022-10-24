@@ -1,5 +1,5 @@
 # This script analyses the relationship of spring and autumn phenological dates 
-# remote-sensing observations (MODIS C6 MCD12Q2 data). Outputs include Figure S4.
+# remote-sensing observations (MODIS C6 MCD12Q2 data). Outputs include ED Fig. 8.
 .
 # load packages
 library(dplyr)
@@ -21,7 +21,7 @@ modis_pheno_sites <- readRDS("~/phenoEOS/data/modis_pheno_sites.rds")
 # Select the pheno band
 df_modis <- modis_pheno_sites %>% rename(on = SOS_2_doy, off = EOS_2_doy) %>% filter(off>on)
 
-# Interannual variation (IAV)
+# Interannual variation (IAV) ####
 # EOS ~ SOS
 fit_iav_modis_off_vs_on = lmer(off ~ scale(on) + (1|sitename), data = df_modis, na.action = "na.exclude")
 summary(fit_iav_modis_off_vs_on)
@@ -34,6 +34,7 @@ out_iav_modis_off_vs_on <- allEffects(fit_iav_modis_off_vs_on)
 gg_iav_modis_off_vs_on <- ggplot_on_modis(out_iav_modis_off_vs_on)
 gg_iav_modis_off_vs_on
 
+# Long-term trends ####
 # Long-term separating mean across years 2001-2018 from interannual anomaly.
 # EOS ~ Mean SOS + Anomalies SOS
 separate_anom <- function(df){
@@ -64,19 +65,28 @@ gg_lt_modis_mean_on <- ggplot_mean_on(out_lt_modis_anom_on)
 gg_lt_modis_anom_on <- ggplot_anom_on(out_lt_modis_anom_on)
 gg_lt_modis_mean_on + gg_lt_modis_anom_on
 
-## Supplementary Fig. S8
+# ED Fig. 8 ####
 ff_lt_modis_mean_on <- gg_lt_modis_mean_on +
   labs(title = expression(paste("EOS ~ ", bold("Mean SOS"), " + Anomalies SOS")), subtitle = "MODIS data") +
-  theme(legend.position = "none",plot.subtitle=element_text(size=10)) 
+  theme(legend.position = "none",
+        plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+        axis.text=element_text(size=6),
+        axis.title=element_text(size=7))
 
 ff_lt_modis_anom_on <- gg_lt_modis_anom_on +
   labs(title = expression(paste("EOS ~ Mean SOS + ", bold("Anomalies SOS"))), subtitle = "") +
   theme(legend.key = element_rect(fill = NA, color = NA),
         legend.position = c(.85, .25),
         legend.direction="vertical",
-        legend.margin = margin(.2, .2, .2, .2),
-        legend.key.size = unit(.6, 'lines'),plot.subtitle=element_text(size=10))  
+        legend.margin = margin(.1, .1, .1, .1),
+        legend.key.size = unit(.45, 'lines'),
+        plot.title=element_text(size=7),plot.subtitle=element_text(size=6),
+        axis.text=element_text(size=6),
+        axis.title=element_text(size=7),
+        legend.text = element_text(size=6))  
 
-figS8 <- ff_lt_modis_mean_on + ff_lt_modis_anom_on + plot_annotation(tag_levels = 'A')
-figS8 
-ggsave("~/phenoEOS/manuscript/figures/fig_S8_rev.png", width = 7.5, height = 4, dpi=300)
+figED8 <- ff_lt_modis_mean_on + ff_lt_modis_anom_on + 
+  plot_annotation(tag_levels = 'A',tag_suffix = ')') & theme(plot.tag = element_text(size = 7))
+figED8 
+ggsave("~/phenoEOS/manuscript/figures/ED_Fig8.jpg", width = 130, height = 70, units="mm",dpi=300)
+ggsave("~/phenoEOS/manuscript/figures/ED_Fig8.eps", device=cairo_ps, width = 130, height = 70, units="mm", dpi=300)
