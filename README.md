@@ -11,6 +11,6 @@ The repository is organized as follows:
 - R - overall functions which are recycled.
 - src - not R specific functions.
 
-Please cite this data as:
+Please cite this data and code as:
 
 > Marqués et al. Acclimation of phenology relieves leaf longevity constraints in deciduous forests. [Nature Ecology & Evolution 2022](https://www.nature.com/articles/s41559-022-01946-1)
